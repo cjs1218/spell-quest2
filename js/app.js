@@ -4,6 +4,7 @@ import {
   summary, daysPractised, comebacks, resetProgress, MASTERED_BOX,
 } from "./store.js";
 import { say, sayLetter, stop, canSpeak } from "./speech.js";
+import { chunks } from "./syllables.js";
 
 const app = document.getElementById("app");
 const SESSION_SIZE = 5;
@@ -47,6 +48,17 @@ function go(hash) {
   stop();
   location.hash = hash;
 }
+
+// The word drawn as coloured syllable chunks, each holding its letters,
+// so syllable chopping and letter-by-letter spelling share one display.
+function chunkedWordHtml(word) {
+  return chunks(word)
+    .map((syl, i) => `<span class="syl syl-${i % 2}" data-syl="${syl}">${[...syl]
+      .map((c) => `<span class="letter">${c}</span>`).join("")}</span>`)
+    .join("");
+}
+
+const beatsLabel = (n) => (n === 1 ? "1 beat" : `${n} beats`);
 
 // ---------- screens ----------
 
@@ -124,7 +136,7 @@ function familyScreen(id) {
       ${fam.words.map((w) => h`
         <li>
           <button class="hear" data-word="${w}" aria-label="Hear ${w}">🔊</button>
-          <span class="word">${w}</span>
+          <span class="word">${chunks(w).join('<span class="dot-sep" aria-hidden="true">·</span>')}</span>
           <span aria-hidden="true">${PLANTS[wordState(w).box]}</span>
         </li>`).join("")}
     </ul>`;
@@ -167,9 +179,11 @@ function learnStep(session) {
       <span></span>
     </header>
     <p class="step-label">Look and listen</p>
-    <div class="big-word" id="bigword">${[...word].map((c) => `<span class="letter">${c}</span>`).join("")}</div>
+    <div class="big-word" id="bigword" aria-label="${word}">${chunkedWordHtml(word)}</div>
+    <p class="beats muted" id="beats">${beatsLabel(chunks(word).length)}</p>
     <div class="row">
       <button class="btn" id="hear">🔊 Hear it</button>
+      ${chunks(word).length > 1 ? `<button class="btn" id="chop">✂️ Chop it</button>` : ""}
       <button class="btn" id="sos">🔤 Spell it with me</button>
     </div>
     ${trick ? `<div class="tip card"><span aria-hidden="true">🧠</span> ${trick}</div>` : ""}
@@ -192,13 +206,32 @@ function learnStep(session) {
     await say(word);
     btn.disabled = false;
   });
+  on("#chop", "click", async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    stop();
+    const big = app.querySelector("#bigword");
+    big.style.setProperty("--chop-len", word.length * 0.8 + chunks(word).length * 0.6);
+    big.classList.add("chopped");
+    for (const el of big.querySelectorAll(".syl")) {
+      el.classList.add("lit");
+      await say(el.dataset.syl, { rate: 0.7 });
+      await sleep(250);
+      el.classList.remove("lit");
+    }
+    await say(word);
+    btn.disabled = false;
+  });
   on("#ready", "click", () => attemptStep(session, 1));
 }
 
 // Step 2: spell it. New words use letter tiles; once a word is growing, type it.
 function attemptStep(session, attempt) {
   const word = session.words[session.index];
-  const useTiles = wordState(word).box < 2;
+  // Scaffolding fades as a word grows: syllable chunks → letter tiles → typing.
+  const box = wordState(word).box;
+  const useChunks = box === 0 && chunks(word).length > 1;
+  const useTiles = !useChunks && box < 2;
   stop();
   app.innerHTML = h`
     <header class="top">
@@ -206,40 +239,47 @@ function attemptStep(session, attempt) {
       ${progressDots(session)}
       <span></span>
     </header>
-    <p class="step-label">${useTiles ? "Build the word" : "Write the word"}</p>
+    <p class="step-label">${useChunks ? "Put the chunks in order" : useTiles ? "Build the word" : "Write the word"}</p>
     <button class="btn" id="hear">🔊 Hear it again</button>
-    ${useTiles ? tilesHtml(word) : typeHtml()}
+    ${useChunks ? tilesHtml(word, chunks(word)) : useTiles ? tilesHtml(word, [...word]) : typeHtml()}
     <button class="btn primary big" id="check" disabled>Check</button>`;
 
   say(word);
   on("#hear", "click", () => say(word));
-  const getAnswer = useTiles ? setupTiles(word) : setupTyping();
+  const getAnswer = useChunks ? setupTiles(word, chunks(word), true) : useTiles ? setupTiles(word, [...word]) : setupTyping();
   on("#check", "click", () => feedbackStep(session, attempt, getAnswer()));
 }
 
-function tilesHtml(word) {
+// pieces = letters, or syllable chunks for the first go at a long word.
+function tilesHtml(word, pieces) {
+  const isChunks = pieces.length !== word.length;
+  // Avoid handing over the answer: reshuffle if chunks land in order.
+  let order = shuffle(pieces);
+  for (let i = 0; i < 5 && order.join("") === word && pieces.length > 1; i++) order = shuffle(pieces);
   return h`
-    <div class="answer-slots" id="slots" aria-live="polite">${[...word].map(() => `<span class="slot"></span>`).join("")}</div>
+    <div class="answer-slots ${isChunks ? "chunk-slots" : ""}" id="slots" aria-live="polite">${pieces
+      .map(() => `<span class="slot"></span>`).join("")}</div>
     <div class="tiles" id="tiles">
-      ${shuffle([...word]).map((c, i) => `<button class="tile" data-i="${i}">${c}</button>`).join("")}
+      ${order.map((c, i) => `<button class="tile ${isChunks ? "chunk-tile" : ""}" data-i="${i}">${c}</button>`).join("")}
     </div>
     <button class="btn subtle" id="undo">↩️ Undo</button>`;
 }
 
-function setupTiles(word) {
+function setupTiles(word, pieces, isChunks = false) {
   const placed = []; // tile buttons in order
   const slots = [...app.querySelectorAll(".slot")];
   const check = app.querySelector("#check");
   const render = () => {
     slots.forEach((s, i) => (s.textContent = placed[i]?.textContent ?? ""));
-    check.disabled = placed.length !== word.length;
+    check.disabled = placed.length !== pieces.length;
   };
   on(".tile", "click", (e) => {
     const t = e.currentTarget;
-    if (t.disabled || placed.length >= word.length) return;
+    if (t.disabled || placed.length >= pieces.length) return;
     t.disabled = true;
     placed.push(t);
-    sayLetter(t.textContent);
+    if (isChunks) say(t.textContent, { rate: 0.7 });
+    else sayLetter(t.textContent);
     render();
   });
   on("#undo", "click", () => {
@@ -282,7 +322,7 @@ function feedbackStep(session, attempt, answer) {
       <div class="celebrate">
         <div class="burst" aria-hidden="true">✨${PLANTS[box]}✨</div>
         <h2>${attempt === 1 ? "Brilliant!" : "You got it!"}</h2>
-        <p class="big-word small">${word}</p>
+        <p class="big-word small chopped">${chunkedWordHtml(word)}</p>
         <p>${msg}</p>
         <button class="btn primary big" id="next">Next</button>
       </div>`;
@@ -405,7 +445,8 @@ function grownUpsScreen() {
       <ul>
         <li>Words are grouped into spelling families from the National Curriculum statutory lists.</li>
         <li>Each word is seen, heard and spelt aloud letter by letter (Simultaneous Oral Spelling) before it's hidden.</li>
-        <li>New words are built from letter tiles. Once a word is growing, the child types it.</li>
+        <li>Longer words are chopped into syllables, shown in alternating colours and spoken beat by beat.</li>
+        <li>Help fades as a word grows: first the syllable chunks are put in order, then the word is built from letter tiles, then typed.</li>
         <li>Spaced repetition brings words back after 1, 2, 4 and 7 days. A mistake moves a word back one step, never to the start.</li>
         <li>There are no timers, no lives and no ads. Progress is stored only on this device.</li>
       </ul>

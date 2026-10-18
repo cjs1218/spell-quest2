@@ -1,6 +1,7 @@
 // Checks every statutory word appears exactly once in js/words.js.
 // Run: node tools/check-words.mjs
 import { YEAR_GROUPS } from "../js/words.js";
+import { SYLLABLES } from "../js/syllables.js";
 
 const STATUTORY = {
   y34: `accident accidentally actual actually address answer appear arrive believe bicycle breath breathe build busy business calendar caught centre century certain circle complete consider continue decide describe different difficult disappear early earth eight eighth enough exercise experience experiment extreme famous favourite February forward forwards fruit grammar group guard guide heard heart height history imagine increase important interest island knowledge learn length library material medicine mention minute natural naughty notice occasion occasionally often opposite ordinary particular peculiar perhaps popular position possess possession possible potatoes pressure probably promise purpose quarter question recent regular reign remember sentence separate special straight strange strength suppose surprise therefore though although thought through various weight woman women`,
@@ -14,6 +15,10 @@ for (const [key, list] of Object.entries(STATUTORY)) {
   const missing = expected.filter((w) => !actual.includes(w));
   const extra = actual.filter((w) => !expected.includes(w));
   const dupes = actual.filter((w, i) => actual.indexOf(w) !== i);
+  const noSyl = actual.filter((w) => !SYLLABLES[w]);
+  const badSyl = actual.filter((w) => SYLLABLES[w] && SYLLABLES[w].join("") !== w);
+  if (noSyl.length) { ok = false; console.log(`  no syllables: ${noSyl.join(", ")}`); }
+  if (badSyl.length) { ok = false; console.log(`  syllables don't spell the word: ${badSyl.join(", ")}`); }
   console.log(`${key}: ${actual.length} words, ${YEAR_GROUPS[key].families.length} families`);
   for (const [label, arr] of [["missing", missing], ["extra", extra], ["duplicated", dupes]]) {
     if (arr.length) { ok = false; console.log(`  ${label}: ${arr.join(", ")}`); }

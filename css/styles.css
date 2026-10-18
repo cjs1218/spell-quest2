@@ -241,3 +241,16 @@ legend { font-weight: 600; padding: 0 0.3rem; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Syllable chopping */
+.syl { display: inline-flex; border-radius: 0.35em; padding: 0 0.06em; transition: margin 0.35s ease, background 0.2s, transform 0.2s; }
+.syl-0 { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.syl-1 { background: color-mix(in srgb, var(--fix) 14%, transparent); }
+.chopped .syl { margin: 0 0.22em; }
+.syl.lit { background: var(--fix-bg); transform: translateY(-0.12em) scale(1.06); }
+.big-word .syl .letter { padding: 0; }
+.beats { text-align: center; margin: -0.5rem 0 0.25rem; }
+.dot-sep { color: var(--muted); padding: 0 0.1em; }
+.chunk-slots .slot { width: auto; min-width: 3.5rem; padding: 0 0.3rem; }
+.tile.chunk-tile { width: auto; min-width: 4rem; padding: 0 0.8rem; }
+.big-word.chopped { font-size: min(2.6rem, calc(85vw / var(--chop-len, 8))); }

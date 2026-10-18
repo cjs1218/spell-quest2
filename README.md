@@ -13,8 +13,11 @@ Every word a child learns grows into a flower in their spelling garden.
 - **Look, listen, spell it with me.** Each word is shown and read aloud in a
   British voice, then spelt letter by letter with the letters lighting up
   (Simultaneous Oral Spelling).
-- **Scaffolding that fades.** New words are built from letter tiles. Once a word
-  is growing, the child types it.
+- **Syllable chopping.** Every word is shown in coloured syllable chunks
+  (*ac·com·mo·date*) with its number of beats. "Chop it" splits the word apart and
+  says each syllable in turn.
+- **Scaffolding that fades.** A brand-new long word is rebuilt from its syllable
+  chunks, then from letter tiles, and once it's growing the child types it.
 - **Spaced repetition.** Words come back after 1, 2, 4 and 7 days. A mistake moves
   a word back one step, never to the start.
 - **Gentle mistakes.** Feedback shows which letters were right (green) and which
@@ -65,10 +68,11 @@ modules on `file://` pages.)
 index.html            page shell
 css/styles.css        dyslexia-friendly theme and layout
 js/words.js           statutory word lists grouped into families, plus memory tricks
+js/syllables.js       syllable splits for every word
 js/store.js           progress, spaced repetition and settings (localStorage)
 js/speech.js          British English text-to-speech
 js/app.js             screens and practice flow
-tools/check-words.mjs checks every statutory word appears exactly once
+tools/check-words.mjs checks every statutory word appears once and has syllables
 ```
 
 Check the word lists after editing them:
@@ -79,7 +83,6 @@ node tools/check-words.mjs
 
 ## Ideas for next steps
 
-- [ ] Syllable-chopping view (*dis·ap·pear*) for longer words
 - [ ] Child records their own memory trick or draws a picture clue
 - [ ] Finger-tracing mode on touchscreens
 - [ ] Mini-games: Syllable Smash, Homophone Hunt, Spot the Spelling Monster
