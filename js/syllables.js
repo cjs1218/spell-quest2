@@ -84,5 +84,85 @@ export const SYLLABLES = Object.fromEntries(
     })
 );
 
+// Splits for words added by grown-ups (e.g. a school list), registered at runtime.
+const custom = {};
+export function registerSplits(map) {
+  Object.assign(custom, map || {});
+}
+
 /** The word split into syllable chunks, e.g. "disappear" → ["dis", "ap", "pear"]. */
-export const chunks = (word) => SYLLABLES[word] || [word];
+export const chunks = (word) =>
+  custom[word] || SYLLABLES[word] || SYLLABLES[word.toLowerCase()] || syllabify(word);
+
+// ---------- automatic splitting for words not in the list ----------
+// A simple teaching-style heuristic: find the vowel sounds, then split the
+// consonants between them, keeping letter teams (sh, ch, th, ck, ng...) together.
+// It won't be perfect, so grown-ups can type their own split with dashes.
+
+const KEEP_BEFORE = ["sh", "ch", "th", "ph", "wh", "qu"]; // go with the next syllable
+const KEEP_AFTER = ["ck", "ng", "gh", "tch", "dge"]; // stay with the previous syllable
+const ENDINGS = ["tion", "sion", "cian", "ture", "sure", "ing", "ful", "less", "ness", "ment"];
+
+const isVowel = (w, i) => {
+  const c = w[i];
+  if ("aeiou".includes(c)) return true;
+  return c === "y" && i > 0; // y is a vowel except at the start
+};
+
+export function syllabify(word) {
+  const w = word.toLowerCase();
+  if (w.length <= 3 || !/^[a-z]+$/.test(w)) return [word];
+
+  // Find vowel groups, ignoring a silent final e (but not -le, as in ta-ble).
+  let end = w.length;
+  if (w.endsWith("e") && !w.endsWith("le") && !w.endsWith("ee") && w.length > 3 && !isVowel(w, w.length - 2)) end -= 1;
+  if (w.endsWith("es") && w.length > 4 && !isVowel(w, w.length - 3)) end -= 2;
+  if (w.endsWith("ed") && w.length > 4 && !/[td]ed$/.test(w)) end -= 2;
+
+  const groups = [];
+  for (let i = 0; i < end; ) {
+    if (isVowel(w, i)) {
+      const start = i;
+      while (i < end && isVowel(w, i)) i++;
+      groups.push([start, i]);
+    } else i++;
+  }
+  if (groups.length <= 1) return [word];
+
+  const cuts = [];
+  for (let g = 0; g < groups.length - 1; g++) {
+    const consStart = groups[g][1];
+    const consEnd = groups[g + 1][0];
+    const cons = w.slice(consStart, consEnd);
+    let cut;
+    if (cons.length === 0) cut = consStart; // two vowel sounds side by side
+    else if (cons.length === 1) cut = consStart; // V|CV  (pa-per)
+    else {
+      cut = consStart + 1; // VC|CV (dif-fer)
+      for (const team of KEEP_AFTER) if (cons.startsWith(team)) cut = consStart + team.length;
+      for (const team of KEEP_BEFORE) if (cons.endsWith(team)) cut = consEnd - team.length;
+      if (cons.length >= 3 && /^[^aeiou](bl|br|cl|cr|dr|fl|fr|gl|gr|pl|pr|sc|sk|sl|sm|sn|sp|st|sw|tr)$/.test(cons)) cut = consStart + 1;
+    }
+    cuts.push(cut);
+  }
+  // A consonant before a final -le goes with it: ta-ble, lit-tle.
+  const leEnding = w.endsWith("le") && w.length > 3 && !isVowel(w, w.length - 3);
+  if (leEnding && cuts.length) cuts[cuts.length - 1] = w.length - 3;
+  // Keep common endings whole (men-tion, wish-ful); a doubled letter splits: hop-ping.
+  for (const ending of ENDINGS) {
+    if (w.endsWith(ending) && w.length > ending.length + 1) {
+      let at = w.length - ending.length;
+      if (w[at - 1] === w[at - 2]) at -= 1;
+      for (let i = 0; i < cuts.length; i++) if (cuts[i] > at - 2 && cuts[i] !== at) cuts[i] = at;
+    }
+  }
+  const unique = [...new Set(cuts)].filter((c) => c > 0 && c < w.length).sort((a, b) => a - b);
+  const parts = [];
+  let prev = 0;
+  for (const c of unique) {
+    parts.push(word.slice(prev, c));
+    prev = c;
+  }
+  parts.push(word.slice(prev));
+  return parts.filter(Boolean);
+}

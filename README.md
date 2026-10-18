@@ -23,10 +23,44 @@ Every word a child learns grows into a flower in their spelling garden.
   a word back one step, never to the start.
 - **Gentle mistakes.** Feedback shows which letters were right (green) and which
   to look at (orange). There's always a second try.
-- **Memory tricks** for the trickiest words (*"There's a rat in separate"*).
-- **A garden that grows** 🟫 → 🌱 → 🌿 → 🌷 → 🌻, plus badges for practice days and
-  "comeback" words.
-- **Grown-ups page** showing progress and the words that need more practice.
+- **"Show me again"** at any point: peek at the word again with no penalty.
+- **Memory tricks** for the trickiest words (*"There's a rat in separate"*), and
+  **picture clues** for words that can be drawn.
+- **Rainbow writing:** trace the word with a finger in three different colours.
+
+### Games (in every year group)
+
+- 🧺 **Word sorting** – sort words into their spelling-family baskets
+- 🔎 **Odd one out** – spot the word with a different pattern
+- 🧱 **Word building** – add prefixes and suffixes (*appear → disappear*), then
+  spell the whole word, including when letters change (*nature → natural*)
+- 🖼️ **Picture words** – spell the word for the picture
+- 🥁 **Beat the drum** – tap once for each syllable
+- 🌈 **Rainbow writing** – trace words in rainbow colours
+
+### Motivation
+
+- **A garden that grows** 🟫 → 🌱 → 🌿 → 🌷 → 🌻 with every word.
+- **Seeds 🌰** earned from practice and games buy new flower types and garden
+  decorations (bees, ladybirds, a pond fountain, a rainbow...).
+- **Hazel the hedgehog** 🦔 cheers children on, and never scolds.
+- **A weekly mission**, such as "Grow 3 plants in a family" or "Play 2 word games".
+- Badges for practice days and "comeback" words.
+
+### For parents and teachers
+
+- **Sibling profiles:** each child has their own garden, progress and settings.
+  With more than one child, the app asks who's practising.
+- **School weekly list:** type in this week's spelling test words. They're chopped
+  into syllables automatically (or type dashes, e.g. *be-cause*) and appear at the
+  top of the home screen with all the same help.
+- **Smarter mistake tracking:** mistakes are sorted into patterns (double letters,
+  silent letters, vowels, letter order, endings, first sounds), with examples.
+  Hazel suggests a family to practise when a pattern keeps coming up.
+- **Printable practice sheets** for tricky words, words in progress or the school
+  list: each word chopped into syllables, a line to trace, space to write it twice,
+  and memory tricks.
+- **Calm mode** for fewer animations.
 
 ## Dyslexia-friendly design
 
@@ -66,14 +100,25 @@ modules on `file://` pages.)
 ## Project structure
 
 ```
-index.html            page shell
-css/styles.css        dyslexia-friendly theme and layout
-js/words.js           statutory word lists grouped into families, plus memory tricks
-js/syllables.js       syllable splits for every word
-js/store.js           progress, spaced repetition and settings (localStorage)
-js/speech.js          British English text-to-speech
-js/app.js             screens and practice flow
-tools/check-words.mjs checks every statutory word appears once and has syllables
+index.html             page shell
+css/styles.css         dyslexia-friendly theme, layout and print sheet
+js/app.js              router
+js/screens.js          home, year groups, families, profiles, settings, grown-ups, school list, print
+js/practice.js         look & listen → spell → feedback flow
+js/games.js            the six word games
+js/garden.js           garden and seed shop
+js/rainbow.js          rainbow writing canvas
+js/store.js            profiles, progress, spaced repetition, seeds, missions (localStorage)
+js/mission.js          weekly missions
+js/mistakes.js         sorts mistakes into patterns
+js/companion.js        Hazel the hedgehog's lines
+js/groups.js           year groups plus the school list
+js/words.js            word lists grouped into families, plus memory tricks
+js/syllables.js        syllable splits, plus automatic splitting for new words
+js/pictures.js         picture clues
+js/builder.js          word-building challenges
+js/speech.js           British English text-to-speech
+tools/check-words.mjs  checks every word appears once and has syllables
 ```
 
 Check the word lists after editing them:
@@ -86,9 +131,10 @@ node tools/check-words.mjs
 
 - [ ] Child records their own memory trick or draws a picture clue
 - [ ] Finger-tracing mode on touchscreens
-- [ ] Mini-games: Syllable Smash, Homophone Hunt, Spot the Spelling Monster
+- [ ] More games: Homophone Hunt, Spot the Spelling Monster, a rhyming game
+- [ ] Dictation sentences
+- [ ] Back up and restore a child's garden with a code
 - [ ] Story mode that uses the week's words, read aloud with highlighting
-- [ ] Import a school's weekly list
 - [ ] OpenDyslexic font option
 - [ ] Works offline (installable web app)
 - [ ] Test with dyslexic children, parents and SENCos
