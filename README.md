@@ -1,13 +1,14 @@
 # Spell Quest 🌻
 
 A fun, dyslexia-friendly app that helps primary school children learn the
-**National Curriculum (England) statutory spelling lists** for Years 3–4 and 5–6.
+**National Curriculum (England)** spellings: the Year 1 and Year 2 common
+exception words and the statutory spelling lists for Years 3–4 and 5–6.
 
 Every word a child learns grows into a flower in their spelling garden.
 
 ## What it does
 
-- **Spelling families, not random lists.** All 200 statutory words are grouped
+- **Spelling families, not random lists.** All 300+ words are grouped
   by pattern (silent letters, soft c, double letters, *-tion* endings and so on),
   each with a child-friendly tip.
 - **Look, listen, spell it with me.** Each word is shown and read aloud in a
@@ -87,7 +88,6 @@ node tools/check-words.mjs
 - [ ] Finger-tracing mode on touchscreens
 - [ ] Mini-games: Syllable Smash, Homophone Hunt, Spot the Spelling Monster
 - [ ] Story mode that uses the week's words, read aloud with highlighting
-- [ ] Year 1–2 common exception words
 - [ ] Import a school's weekly list
 - [ ] OpenDyslexic font option
 - [ ] Works offline (installable web app)

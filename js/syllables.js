@@ -4,6 +4,23 @@
 // hyphenation. Checked by tools/check-words.mjs.
 
 const RAW = `
+the the | a a | do do | to to | today to-day | of of | said said | says says | is is | his his
+has has | was was | were were | are are | I I | you you | your your | they they | our our
+be be | he he | me me | she she | we we | no no | go go | so so | by by | my my | here here
+there there | where where | love love | come come | some some | one one | once once | put put
+push push | pull pull | full full | ask ask | friend friend | school school | house house
+
+door door | floor floor | poor poor | find find | kind kind | mind mind | behind be-hind
+child child | children chil-dren | wild wild | climb climb | old old | cold cold | gold gold
+hold hold | told told | most most | only on-ly | both both | every ev-er-y
+everybody ev-er-y-bod-y | even e-ven | great great | break break | steak steak | after af-ter
+fast fast | last last | past past | father fa-ther | class class | grass grass | pass pass
+plant plant | path path | bath bath | move move | prove prove | improve im-prove | who who
+could could | should should | would would | sure sure | sugar su-gar | because be-cause
+pretty pret-ty | beautiful beau-ti-ful | eye eye | hour hour | any an-y | many man-y
+whole whole | clothes clothes | busy bus-y | people peo-ple | water wa-ter | again a-gain
+half half | money mon-ey | parent par-ent | Christmas Christ-mas | Mr Mr | Mrs Mrs
+
 accident ac-ci-dent | accidentally ac-ci-den-tal-ly | actual ac-tu-al | actually ac-tu-al-ly
 address ad-dress | answer an-swer | appear ap-pear | arrive ar-rive | believe be-lieve
 bicycle bi-cy-cle | breath breath | breathe breathe | build build | busy bus-y

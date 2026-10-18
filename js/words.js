@@ -1,9 +1,134 @@
-// National Curriculum (England) statutory spelling lists, grouped into
+// National Curriculum (England) common exception words (Years 1 and 2) and
+// statutory spelling lists (Years 3–6), grouped into
 // spelling families so children learn by pattern rather than by random list.
 // Each family has a short child-friendly tip. Every statutory word appears
 // in exactly one family (checked by tools/check-words.mjs).
 
 export const YEAR_GROUPS = {
+  y1: {
+    label: "Year 1",
+    families: [
+      {
+        id: "y1-tiny",
+        name: "Little words that trick you",
+        tip: "These words are short but don't sound how they look. Say them the 'silly' way: sa-ID, o-F.",
+        words: ["the", "a", "do", "to", "today", "of", "said", "says"],
+      },
+      {
+        id: "y1-was",
+        name: "is, was and were",
+        tip: "In these words the s often says 'z': hiZ, haZ, waZ.",
+        words: ["is", "his", "has", "was", "were", "are"],
+      },
+      {
+        id: "y1-people",
+        name: "Me, you and them",
+        tip: "Capital I is always tall when it means you!",
+        words: ["I", "you", "your", "they", "our"],
+      },
+      {
+        id: "y1-e",
+        name: "e says its name",
+        tip: "At the end of a little word, e says 'ee': be, he, me, she, we.",
+        words: ["be", "he", "me", "she", "we"],
+      },
+      {
+        id: "y1-o-y",
+        name: "o and y at the end",
+        tip: "o at the end says 'oh': no, go, so. y at the end says 'eye': by, my.",
+        words: ["no", "go", "so", "by", "my"],
+      },
+      {
+        id: "y1-here",
+        name: "here, there, where",
+        tip: "All three have 'here' inside them – here is a place, so are there and where!",
+        words: ["here", "there", "where"],
+      },
+      {
+        id: "y1-o-u",
+        name: "o that says 'u'",
+        tip: "In these words o says 'u' as in up: l-o-ve, c-o-me.",
+        words: ["love", "come", "some", "one", "once"],
+      },
+      {
+        id: "y1-u-oo",
+        name: "u that says 'oo'",
+        tip: "Push, pull, put – these are all things you do with your hands!",
+        words: ["put", "push", "pull", "full"],
+      },
+      {
+        id: "y1-tricky",
+        name: "Tricky words",
+        tip: "Draw a picture clue for each one.",
+        words: ["ask", "friend", "school", "house"],
+      },
+    ],
+  },
+  y2: {
+    label: "Year 2",
+    families: [
+      {
+        id: "y2-oor",
+        name: "'oor' says 'or'",
+        tip: "Open the door, walk on the floor.",
+        words: ["door", "floor", "poor"],
+      },
+      {
+        id: "y2-i",
+        name: "i says its name",
+        tip: "Before nd or ld, i often says 'eye': kind, wild. But watch out for children!",
+        words: ["find", "kind", "mind", "behind", "child", "children", "wild", "climb"],
+      },
+      {
+        id: "y2-o",
+        name: "o says its name",
+        tip: "Before ld, st or th, o often says 'oh': old, most, both.",
+        words: ["old", "cold", "gold", "hold", "told", "most", "only", "both"],
+      },
+      {
+        id: "y2-e-ea",
+        name: "e and ea surprises",
+        tip: "ea usually says 'ee', but in great, break and steak it says 'ay'.",
+        words: ["every", "everybody", "even", "great", "break", "steak"],
+      },
+      {
+        id: "y2-a-ar",
+        name: "a in fast, grass and path",
+        tip: "Some people say 'ar' in these words and some say 'a' – however you say it, you just write a.",
+        words: ["after", "fast", "last", "past", "father", "class", "grass", "pass", "plant", "path", "bath"],
+      },
+      {
+        id: "y2-o-oo",
+        name: "o that says 'oo'",
+        tip: "Move, prove, improve – they all end the same way.",
+        words: ["move", "prove", "improve", "who"],
+      },
+      {
+        id: "y2-ould",
+        name: "could, should, would",
+        tip: "O U Lucky Duck! All three end in -ould.",
+        words: ["could", "should", "would"],
+      },
+      {
+        id: "y2-s-sh",
+        name: "s that says 'sh'",
+        tip: "Are you sure there's sugar in it? Both start with s that sounds like 'sh'.",
+        words: ["sure", "sugar"],
+      },
+      {
+        id: "y2-tricky-a",
+        name: "Tricky words – set A",
+        tip: "Make up a silly sentence for each one.",
+        words: ["because", "pretty", "beautiful", "eye", "hour", "any", "many", "whole"],
+      },
+      {
+        id: "y2-tricky-b",
+        name: "Tricky words – set B",
+        tip: "Chop them into beats and say each part: peo-ple, wa-ter.",
+        words: ["clothes", "busy", "people", "water", "again", "half", "money", "parent", "Christmas", "Mr", "Mrs"],
+      },
+    ],
+  },
   y34: {
     label: "Years 3 & 4",
     families: [
@@ -150,6 +275,15 @@ export const YEAR_GROUPS = {
 
 // Built-in memory tricks for some of the trickiest words.
 export const MNEMONICS = {
+  because: "Big Elephants Can Always Understand Small Elephants.",
+  said: "Sally Ann Is Dancing.",
+  friend: "A friend is there to the END.",
+  people: "People Eat Orange Peel Like Elephants.",
+  could: "O U Lucky Duck – c-ould.",
+  should: "O U Lucky Duck – sh-ould.",
+  would: "O U Lucky Duck – w-ould.",
+  eye: "An eye has two e's like two eyes, with a nose (y) in the middle.",
+  here: "Here, there and where all have 'here' in them.",
   separate: "There's A RAT in sepARATe!",
   necessary: "One Collar, two Sleeves – one c, two s's.",
   island: "An island IS LAND surrounded by water.",
