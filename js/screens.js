@@ -1,6 +1,6 @@
 import { MNEMONICS, YEAR_GROUPS } from "./words.js";
 import {
-  getSettings, saveSettings, DEFAULT_SETTINGS, wordState, isDue, summary, daysPractised,
+  getSettings, saveSettings, DEFAULT_SETTINGS, wordState, isDue, summary, growth, daysPractised,
   comebacks, resetProgress, MASTERED_BOX, profiles, currentProfile, switchProfile, addProfile,
   updateProfile, deleteProfile, AVATARS, seeds, garden, setLastGroup, lastGroup, mistakeCounts,
   mistakeLog, schoolList, setSchoolList,
@@ -47,14 +47,12 @@ export function homeScreen() {
   const school = groups.school;
 
   const yearCards = Object.entries(YEAR_GROUPS).map(([key, g]) => {
-    const words = allWords(g);
-    const { mastered, growing } = summary(words);
-    const pct = Math.round(((mastered + growing * 0.4) / words.length) * 100);
+    const gr = growth(allWords(g));
     return h`
       <a class="card year-card" href="#/year/${key}">
-        <div class="year-row"><h2>${g.label}</h2><span class="muted">${mastered}/${words.length} 🌻</span></div>
-        <div class="meter" aria-hidden="true"><span style="width:${pct}%"></span></div>
-        <p class="muted small">${growing ? `${growing} growing` : "Tap to start"}</p>
+        <div class="year-row"><h2>${g.label}</h2><span class="muted">${gr.pct}% grown</span></div>
+        <div class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></div>
+        <p class="muted small">${growthLine(gr)}</p>
       </a>`;
   });
 
@@ -65,12 +63,12 @@ export function homeScreen() {
     .map((w) => plantFor(wordState(w).box)).join("");
 
   const schoolCard = school ? (() => {
-    const words = allWords(school);
-    const { mastered } = summary(words);
+    const gr = growth(allWords(school));
     return h`
       <a class="card school-card" href="#/family/school">
-        <div class="year-row"><h2>📝 ${esc(school.label)}</h2><span class="muted">${mastered}/${words.length} 🌻</span></div>
-        <p class="muted small">This week's spellings from school</p>
+        <div class="year-row"><h2>📝 ${esc(school.label)}</h2><span class="muted">${gr.pct}% grown</span></div>
+        <div class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></div>
+        <p class="muted small">${gr.steps ? growthLine(gr) : "This week's spellings from school"}</p>
       </a>`;
   })() : "";
 
@@ -106,6 +104,23 @@ export function homeScreen() {
     <a class="small-link" href="#/grown-ups">For grown-ups</a>`;
 }
 
+// "🌻 2 grown · 🌱 3 growing" – counts every stage, not just full flowers.
+function growthLine(gr) {
+  if (!gr.steps) return `${gr.total} words to plant`;
+  const parts = [];
+  if (gr.mastered) parts.push(`🌻 ${gr.mastered} fully grown`);
+  if (gr.growing) parts.push(`🌱 ${gr.growing} growing`);
+  if (gr.notStarted) parts.push(`${gr.notStarted} to plant`);
+  return parts.join(" · ");
+}
+
+// Four little drops show how many right answers a word has had (4 = a flower).
+function pipsHtml(word) {
+  const b = Math.min(wordState(word).box, MASTERED_BOX);
+  return `<span class="pips" aria-label="${b} of ${MASTERED_BOX} right answers">${
+    Array.from({ length: MASTERED_BOX }, (_, i) => `<span class="pip ${i < b ? "on" : ""}"></span>`).join("")}</span>`;
+}
+
 // ---------- year group ----------
 
 export function yearScreen(key) {
@@ -113,13 +128,14 @@ export function yearScreen(key) {
   if (!g) return go("#/");
   setLastGroup(key);
   const rows = g.families.map((f) => {
-    const { mastered, total } = summary(f.words);
+    const gr = growth(f.words);
     const due = f.words.filter((w) => isDue(w)).length;
     return h`
       <a class="card family-card" href="#/family/${f.id}">
-        <div>
-          <h3>${esc(f.name)}</h3>
-          <p class="muted">${mastered} of ${total} grown${due ? ` · <strong>${due} ready to water 💧</strong>` : ""}</p>
+        <div class="family-info">
+          <div class="year-row"><h3>${esc(f.name)}</h3><span class="muted small nowrap">${gr.pct}%</span></div>
+          <div class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></div>
+          <p class="muted small">${growthLine(gr)}${due ? ` · <strong>${due} ready to water 💧</strong>` : ""}</p>
         </div>
         <span class="plants" aria-hidden="true">${f.words.map((w) => plantFor(wordState(w).box)).join("")}</span>
       </a>`;
@@ -153,6 +169,7 @@ export function familyScreen(id) {
           <button class="hear" data-word="${esc(w)}" aria-label="Hear ${esc(w)}">🔊</button>
           <span class="word">${chunks(w).map(esc).join('<span class="dot-sep" aria-hidden="true">·</span>')}</span>
           ${picture(w) ? `<span class="pic-small" aria-hidden="true">${picture(w)}</span>` : ""}
+          ${pipsHtml(w)}
           <span aria-hidden="true">${plantFor(wordState(w).box)}</span>
         </li>`).join("")}
     </ul>

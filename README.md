@@ -40,7 +40,9 @@ Every word a child learns grows into a flower in their spelling garden.
 
 ### Motivation
 
-- **A garden that grows** 🟫 → 🌱 → 🌿 → 🌷 → 🌻 with every word.
+- **A garden that grows** 🟫 → 🌱 → 🌿 → 🌷 → 🌻 with every word. Every right
+  answer counts: four dots under each word fill up, and families and year groups
+  show a "% grown" bar, so progress is visible long before a flower is fully grown.
 - **Seeds 🌰** earned from practice and games buy new flower types and garden
   decorations (bees, ladybirds, a pond fountain, a rainbow...).
 - **Hazel the hedgehog** 🦔 cheers children on, and never scolds.

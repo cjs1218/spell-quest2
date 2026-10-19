@@ -184,7 +184,12 @@ function feedbackStep(session, attempt, answer) {
 
   if (correct) {
     const box = wordState(word).box;
-    const msg = box >= MASTERED_BOX ? "Your flower is fully grown!" : "Your plant grew!";
+    const left = MASTERED_BOX - box;
+    const msg = box >= MASTERED_BOX
+      ? "Your flower is fully grown! 🌻"
+      : result?.grew
+        ? `Your plant grew! ${left === 1 ? "Just 1 more right answer" : `${left} more right answers`} to make it a flower.`
+        : `${left === 1 ? "1 more right answer" : `${left} more right answers`} to make it a flower.`;
     const headline = praise(attempt === 1 ? "correct" : "retry");
     const comment = result?.mastered
       ? companionHtml("mastered")

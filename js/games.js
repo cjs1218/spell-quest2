@@ -2,7 +2,7 @@
 // gives gentle feedback, and earns seeds.
 
 import { getGroup, allWords, patternFamilies } from "./groups.js";
-import { addSeeds, recordGamePlayed, SEEDS, wordState, MASTERED_BOX } from "./store.js";
+import { addSeeds, recordGamePlayed, SEEDS, wordState, MASTERED_BOX, recordAttempt } from "./store.js";
 import { checkMission } from "./mission.js";
 import { chunks } from "./syllables.js";
 import { picture } from "./pictures.js";
@@ -297,7 +297,10 @@ function pictureGame(ctx) {
   let solved = false;
   on("#check", "click", () => {
     if (solved) return nextRound(ctx, pictureGame);
-    if (get().toLowerCase() === word.toLowerCase()) {
+    const right = get().toLowerCase() === word.toLowerCase();
+    // Spelling the picture is real practice, so the first try helps the word grow.
+    if (tries === 0) recordAttempt(word, right, get());
+    if (right) {
       solved = true;
       if (tries === 0) win(ctx);
       app.querySelector("#msg").innerHTML = feedbackRow(true, `${esc(cheerLine())} ${esc(word)}`);

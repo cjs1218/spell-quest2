@@ -225,6 +225,23 @@ export function summary(words) {
   return { mastered, growing, total: words.length };
 }
 
+/**
+ * How much a set of words has grown, counting every right answer.
+ * Each word needs MASTERED_BOX right answers to become a flower, so
+ * `pct` moves up every time the child spells any word correctly.
+ */
+export function growth(words) {
+  let steps = 0, mastered = 0, growing = 0;
+  for (const w of words) {
+    const b = Math.min(wordState(w).box, MASTERED_BOX);
+    steps += b;
+    if (b >= MASTERED_BOX) mastered += 1;
+    else if (b > 0) growing += 1;
+  }
+  const max = words.length * MASTERED_BOX || 1;
+  return { steps, max, pct: Math.round((steps / max) * 100), mastered, growing, notStarted: words.length - mastered - growing, total: words.length };
+}
+
 export const daysPractised = () => data.streakDays.length;
 export const comebacks = () => data.comebacks;
 
