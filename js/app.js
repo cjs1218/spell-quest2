@@ -10,7 +10,7 @@ import {
 } from "./screens.js";
 import { gardenScreen } from "./garden.js";
 import { gameScreen } from "./games.js";
-import { todayScreen } from "./screens.js";
+import { todayScreen, wordScreen } from "./screens.js";
 import { isUnlocked, gateScreen } from "./gate.js";
 import { protectStorage } from "./backup.js";
 import "./readaloud.js";
@@ -37,6 +37,7 @@ function route() {
   if (screen === "today") todayScreen();
   else if (screen === "year") yearScreen(a);
   else if (screen === "family") familyScreen(a);
+  else if (screen === "word") wordScreen(a, b);
   else if (screen === "game") gameScreen(a, b);
   else if (screen === "garden") gardenScreen();
   else if (screen === "profiles") profilesScreen();

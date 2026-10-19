@@ -273,30 +273,4 @@ export const YEAR_GROUPS = {
   },
 };
 
-// Built-in memory tricks for some of the trickiest words.
-export const MNEMONICS = {
-  because: "Big Elephants Can Always Understand Small Elephants.",
-  said: "Sally Ann Is Dancing.",
-  friend: "A friend is there to the END.",
-  people: "People Eat Orange Peel Like Elephants.",
-  could: "O U Lucky Duck – c-ould.",
-  should: "O U Lucky Duck – sh-ould.",
-  would: "O U Lucky Duck – w-ould.",
-  eye: "An eye has two e's like two eyes, with a nose (y) in the middle.",
-  here: "Here, there and where all have 'here' in them.",
-  separate: "There's A RAT in sepARATe!",
-  necessary: "One Collar, two Sleeves – one c, two s's.",
-  island: "An island IS LAND surrounded by water.",
-  believe: "Never beLIEve a LIE.",
-  February: "Feb-RU-ary – are you (RU) ready for February?",
-  embarrass: "Two Red cheeks and Two Shy smiles – double r, double s.",
-  accommodate: "It's big enough to accommodate two c's AND two m's.",
-  rhythm: "Rhythm Helps Your Two Hips Move.",
-  height: "Eight is in heIGHT.",
-  weight: "Eight is in wEIGHT.",
-  heart: "You HEAR with your EAR, and there's EAR in hEARt.",
-  government: "To GOVERN the country.",
-  environment: "There's IRON in envIRONment.",
-  definite: "There's FINITE in deFINITE.",
-  queue: "Q and four letters waiting in a queue: q-ueue.",
-};
+// Memory tricks live in mnemonics.js.

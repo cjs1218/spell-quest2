@@ -1,4 +1,6 @@
-import { MNEMONICS, YEAR_GROUPS } from "./words.js";
+import { YEAR_GROUPS } from "./words.js";
+import { trick, trickText } from "./mnemonics.js";
+import { trickCardHtml, trickWordHtml } from "./trickview.js";
 import {
   getSettings, saveSettings, DEFAULT_SETTINGS, wordState, isDue, summary, growth, daysPractised,
   comebacks, resetProgress, MASTERED_BOX, profiles, currentProfile, switchProfile, addProfile,
@@ -18,7 +20,7 @@ import { picture } from "./pictures.js";
 import { todaysPlan, todayFamily } from "./today.js";
 import { needsSafetyReminder, dismissSafetyReminder, keepSafeHtml, setupKeepSafe } from "./backup.js";
 import { lock } from "./gate.js";
-import { app, h, esc, on, go, header, applySettings, PLANTS, seedBadge, toast } from "./ui.js";
+import { app, h, esc, on, go, header, applySettings, PLANTS, seedBadge, toast, beatsLabel } from "./ui.js";
 
 const plantFor = (box) => (box >= MASTERED_BOX ? garden().flower : PLANTS[box]);
 
@@ -199,11 +201,12 @@ export function familyScreen(id) {
     ${header(back, esc(fam.name), seedBadge())}
     <div class="tip card"><span aria-hidden="true">💡</span> ${esc(fam.tip)}</div>
     <button class="btn primary big" id="start">Start practising</button>
+    <p class="muted small">Tap a word to see it up close${fam.words.some((w) => trick(w)) ? ", with its memory trick 🧠" : ""}.</p>
     <ul class="word-list">
       ${fam.words.map((w) => h`
         <li>
           <button class="hear" data-word="${esc(w)}" aria-label="Hear ${esc(w)}">🔊</button>
-          <span class="word">${chunks(w).map(esc).join('<span class="dot-sep" aria-hidden="true">·</span>')}</span>
+          <a class="word word-link" href="#/word/${encodeURIComponent(w)}/${fam.id}">${chunks(w).map(esc).join('<span class="dot-sep" aria-hidden="true">·</span>')}${trick(w) ? `<span class="has-trick" title="Has a memory trick">🧠</span>` : ""}</a>
           ${picture(w) ? `<span class="pic-small" aria-hidden="true">${picture(w)}</span>` : ""}
           ${grewToday(w) ? `<span class="watered" title="Grown today – it grows again tomorrow" aria-label="Watered today">💧</span>` : ""}
           ${pipsHtml(w)}
@@ -213,6 +216,56 @@ export function familyScreen(id) {
     ${group.isSchool ? `<a class="small-link" href="#/school">Grown-ups: change this list</a>` : ""}`;
   on(".hear", "click", (e) => say(e.currentTarget.dataset.word));
   on("#start", "click", () => startSession(fam, groupKey));
+}
+
+// ---------- word page ----------
+
+export function wordScreen(rawWord, familyId) {
+  const word = decodeURIComponent(rawWord || "");
+  const found = findFamily(familyId);
+  const fam = found?.fam;
+  if (!fam || !fam.words.includes(word)) return go("#/");
+  const i = fam.words.indexOf(word);
+  const prev = fam.words[i - 1], next = fam.words[i + 1];
+  const pic = picture(word);
+  const b = Math.min(wordState(word).box, MASTERED_BOX);
+  app.innerHTML = h`
+    ${header(`#/family/${fam.id}`, esc(fam.name), seedBadge())}
+    <div class="word-page">
+      ${pic ? `<div class="picture-clue" aria-hidden="true">${pic}</div>` : ""}
+      <div class="big-word chopped" id="bigword" aria-label="${esc(word)}">${trick(word) ? trickWordHtml(word) : chunks(word).map((c, n) => `<span class="syl syl-${n % 2}">${[...c].map((l) => `<span class="letter">${esc(l)}</span>`).join("")}</span>`).join("")}</div>
+      <p class="beats muted center">${beatsLabel(chunks(word).length)} · ${plantFor(wordState(word).box)} ${b} of ${MASTERED_BOX}</p>
+      <div class="row"><button class="btn" id="hear">🔊 Hear it</button><button class="btn" id="spell">🔤 Spell it with me</button></div>
+      ${trick(word) ? trickCardHtml(word) : h`
+        <div class="card trick-card make-own">
+          <div class="trick-picture" aria-hidden="true">💭</div>
+          <div class="trick-body">
+            <p class="trick-label">🧠 Make your own trick</p>
+            <p class="small">No famous trick for this one! Can you spot a little word hiding inside it, or make up a silly sentence?</p>
+          </div>
+        </div>`}
+      <button class="btn primary big" id="practise">Practise this word</button>
+      <div class="row word-nav">
+        ${prev ? `<a class="btn subtle" href="#/word/${encodeURIComponent(prev)}/${fam.id}">← ${esc(prev)}</a>` : "<span></span>"}
+        ${next ? `<a class="btn subtle" href="#/word/${encodeURIComponent(next)}/${fam.id}">${esc(next)} →</a>` : "<span></span>"}
+      </div>
+    </div>`;
+  say(word);
+  on("#hear", "click", () => { stop(); say(word); });
+  on("#spell", "click", async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    stop();
+    await say(word);
+    for (const el of app.querySelectorAll("#bigword .letter")) {
+      el.classList.add("lit");
+      await say(el.textContent.toLowerCase(), { rate: 0.7 });
+      el.classList.remove("lit");
+    }
+    await say(word);
+    btn.disabled = false;
+  });
+  on("#practise", "click", () => startSession(fam, found.groupKey, [word]));
 }
 
 const yearOptions = (chosen) =>
@@ -577,7 +630,7 @@ export function printScreen(source = "tricky") {
             ${words.map((w) => h`
               <tr>
                 <td class="sheet-word">${chunks(w).map((c, i) => `<span class="psyl psyl-${i % 2}">${esc(c)}</span>`).join("")}
-                  ${MNEMONICS[w] ? `<div class="sheet-trick">🧠 ${esc(MNEMONICS[w])}</div>` : ""}</td>
+                  ${trickText(w) ? `<div class="sheet-trick">🧠 ${esc(trickText(w))}</div>` : ""}</td>
                 <td class="trace">${esc(w)}</td>
                 <td class="write"></td>
                 <td class="write"></td>

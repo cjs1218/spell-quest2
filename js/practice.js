@@ -1,6 +1,7 @@
 // The core practice flow: look & listen → spell → gentle feedback.
 
-import { MNEMONICS } from "./words.js";
+import { trick as getTrick } from "./mnemonics.js";
+import { trickCardHtml, trickWordHtml } from "./trickview.js";
 import { wordState, isDue, recordAttempt, MASTERED_BOX, garden, grewToday } from "./store.js";
 import { alignSpelling, describeDifference } from "./align.js";
 import { instructionHtml, readInstruction, withSayButton } from "./readaloud.js";
@@ -79,7 +80,7 @@ async function chopAnimation(big, word) {
 // Step 1: look, listen, chop it and spell it aloud together (SOS).
 function learnStep(session) {
   const word = session.words[session.index];
-  const trick = MNEMONICS[word];
+  const trick = getTrick(word);
   const pic = picture(word);
   const multi = chunks(word).length > 1;
   app.innerHTML = h`
@@ -87,7 +88,7 @@ function learnStep(session) {
     ${session.index === 0 ? companionHtml("start") : ""}
     ${instructionHtml("Look and listen")}
     ${pic ? `<div class="picture-clue" aria-hidden="true">${pic}</div>` : ""}
-    <div class="big-word" id="bigword" aria-label="${esc(word)}">${chunkedWordHtml(word)}</div>
+    <div class="big-word" id="bigword" aria-label="${esc(word)}">${trick ? trickWordHtml(word) : chunkedWordHtml(word)}</div>
     <p class="beats muted">${beatsLabel(chunks(word).length)}</p>
     <div class="row">
       <button class="btn" id="hear">🔊 Hear it</button>
@@ -95,7 +96,7 @@ function learnStep(session) {
       <button class="btn" id="sos">🔤 Spell it with me</button>
       <button class="btn" id="rainbow">🌈 Rainbow write</button>
     </div>
-    ${trick ? `<div class="tip card speakable"><span aria-hidden="true">🧠</span> ${withSayButton(esc(trick))}</div>` : ""}
+    ${trick ? trickCardHtml(word, { compact: true }) : ""}
     <button class="btn primary big" id="ready">I'm ready! Hide the word</button>
     <div id="overlay"></div>`;
 

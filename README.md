@@ -35,8 +35,14 @@ Every word a child learns grows into a flower in their spelling garden.
   reads out Hazel's words, tips and instructions, for children who can't read
   them yet.
 - **"Show me again"** at any point: peek at the word again with no penalty.
-- **Memory tricks** for the trickiest words (*"There's a rat in separate"*), and
-  **picture clues** for words that can be drawn.
+- **Memory tricks with pictures** for 61 words (in `js/mnemonics.js`): the tricks
+  widely used in UK schools (*"There's a rat in separate"*, *"Big Elephants Can
+  Always Understand Small Elephants"*, *"O U Lucky Duck"*), plus clearly marked
+  suggestions for other tricky words. The trick's letters light up in the word,
+  and acrostics show each first letter.
+- **Word pages:** tap any word to see it up close with its picture, syllables,
+  memory trick (or a prompt to make your own) and a "Practise this word" button.
+- **Picture clues** for words that can be drawn.
 - **Rainbow writing:** trace the word with a finger in three different colours.
 
 ### Games (in every year group)
@@ -150,7 +156,9 @@ js/mistakes.js         sorts mistakes into patterns
 js/companion.js        Hazel the hedgehog
 js/praise.js           all praise and encouragement lines
 js/groups.js           year groups plus the school list
-js/words.js            word lists grouped into families, plus memory tricks
+js/words.js            word lists grouped into families
+js/mnemonics.js        memory tricks (common UK ones and suggestions)
+js/trickview.js        memory trick cards and highlighted words
 js/syllables.js        syllable splits, plus automatic splitting for new words
 js/pictures.js         picture clues
 js/builder.js          word-building challenges
@@ -163,7 +171,7 @@ sw.js                  offline support (service worker)
 manifest.webmanifest   app name and icons for installing
 js/speech.js           British English text-to-speech (teaching, cheerful and gentle styles)
 js/sounds.js           celebration sound effects
-tools/check-words.mjs  checks every word appears once and has syllables
+tools/check-words.mjs  checks every word appears once, has syllables, and every trick fits its word
 ```
 
 Check the word lists after editing them:

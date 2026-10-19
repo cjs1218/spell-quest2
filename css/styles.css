@@ -550,3 +550,38 @@ select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem
 .manage-row .year-select { width: auto; flex: 0 0 auto; margin-top: 0; }
 #keep-safe ol { padding-left: 1.3rem; }
 [hidden] { display: none !important; }
+
+/* ---------- Memory tricks and word pages ---------- */
+.trick-card { display: flex; gap: 0.9rem; align-items: center; border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.trick-picture { font-size: 3.4rem; line-height: 1.1; flex: none; text-align: center; min-width: 4rem; }
+.trick-card.compact .trick-picture { font-size: 2.4rem; min-width: 3rem; }
+.trick-body { flex: 1; min-width: 0; }
+.trick-label { margin: 0 0 0.2rem; font-weight: 600; color: var(--accent); font-size: 0.9rem; }
+.trick-text { margin: 0.2rem 0; font-size: 1.1rem; font-weight: 600; }
+.trick-card.compact .trick-text { font-size: 1rem; }
+.trick-source { margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--muted); }
+.acrostic { display: flex; flex-wrap: wrap; gap: 0.2rem 0.6rem; margin: 0.2rem 0 0.3rem; }
+.acro-word { white-space: nowrap; }
+.acro-first {
+  display: inline-block; min-width: 1.5em; text-align: center; font-weight: 700; font-size: 1.25em;
+  background: var(--fix-bg); color: var(--fix); border-radius: 0.3em; margin-right: 0.05em;
+}
+.big-word .letter.trick-hi { background: var(--fix-bg); color: var(--fix); box-shadow: inset 0 -0.12em 0 var(--fix); }
+
+.word-link { text-decoration: none; display: inline-flex; align-items: center; gap: 0.1em; }
+.word-link:hover, .word-link:focus-visible { text-decoration: underline; }
+.has-trick { font-size: 0.85rem; margin-left: 0.35rem; }
+.word-page .picture-clue { margin-top: 0.25rem; }
+.word-nav { justify-content: space-between; }
+.make-own .trick-picture { opacity: 0.8; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.trick-card.is-acrostic { flex-direction: column; align-items: stretch; text-align: left; }
+.trick-card.is-acrostic .trick-picture { font-size: 2.6rem; }
+.is-acrostic .acrostic { flex-direction: column; gap: 0.25rem; font-size: 1.15rem; }
+.is-acrostic .trick-text { display: flex; justify-content: flex-end; margin-top: -2.2rem; }
+.big-word .letter.trick-hi { box-shadow: none; text-decoration: underline; text-decoration-thickness: 0.08em; text-underline-offset: 0.12em; }
+.word-list li { gap: 0.5rem; }
+.word-list .word { flex: 1; min-width: 0; flex-wrap: wrap; overflow-wrap: anywhere; }
+.word-list .pips { gap: 0.15rem; flex: none; }
+.word-list .pip { width: 0.5rem; height: 0.5rem; }
+.word-list li > span[aria-hidden="true"]:last-child { flex: none; }

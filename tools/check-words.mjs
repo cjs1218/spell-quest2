@@ -26,4 +26,24 @@ for (const [key, list] of Object.entries(STATUTORY)) {
     if (arr.length) { ok = false; console.log(`  ${label}: ${arr.join(", ")}`); }
   }
 }
-process.exit(ok ? 0 : 1);
+
+
+// Check every memory trick fits its word.
+const { TRICKS } = await import("../js/mnemonics.js");
+const allWords = new Set(Object.values(YEAR_GROUPS).flatMap((g) => g.families.flatMap((f) => f.words)));
+for (const [word, t] of Object.entries(TRICKS)) {
+  const w = word.toLowerCase();
+  let problem = "";
+  if (!allWords.has(word)) problem = "not in the word lists";
+  else if (t.kind === "hidden" && !w.includes(t.hide.toLowerCase())) problem = `doesn't contain "${t.hide}"`;
+  else if (t.kind === "letters" && t.marks.some((m) => !w.includes(m))) problem = "marked letters not in word";
+  else if (t.kind === "acrostic") {
+    const part = (t.part || word).toLowerCase();
+    const initials = t.text.replace(/[!.,]/g, "").split(/\s+/).map((x) => x[0].toLowerCase()).join("").slice(0, part.length);
+    if (!w.includes(part)) problem = `doesn't contain "${part}"`;
+    else if (initials !== part) problem = `first letters spell "${initials}", not "${part}"`;
+  }
+  if (problem) { ok = false; console.log(`  trick for ${word}: ${problem}`); }
+}
+console.log(`tricks: ${Object.keys(TRICKS).length} (${Object.values(TRICKS).filter((t) => t.source === "common").length} common, ${Object.values(TRICKS).filter((t) => t.source === "suggested").length} suggested)`);
+process.exitCode = ok ? 0 : 1;
