@@ -15,9 +15,12 @@ export const RAINBOW = [
   { name: "purple", hex: "#8e24aa" },
 ];
 const NEEDED = 3; // goes to finish
-// How much tracing counts as one go: drawn length compared with the word's width.
-// Tracing every letter covers far more than the width, so this is generous.
-const GO_LENGTH = 1.2;
+// A go counts when the child has traced over the whole word: most of the
+// word's shape overall, and a good part of EVERY letter, so lifting the
+// finger between letters (or stopping half-way) doesn't count as a go.
+const WORD_COVER = 0.6; // share of the word's shape traced
+const LETTER_COVER = 0.4; // share of each letter traced
+const SAMPLE_STEP = 3; // px between sample points on the word's shape
 
 const starsHtml = (done) =>
   Array.from({ length: NEEDED }, (_, i) =>
@@ -56,11 +59,13 @@ export function setupRainbow(root, word, onDone) {
 
   let goes = 0;
   let colourIndex = 0;
-  let drawnThisGo = 0; // length traced in the current colour
-  let wordWidth = 200;
   let drawing = false;
-  let waitForLift = false; // after a go is done, the next one starts on a new touch
   let last = null;
+  // Points sampled from the word's letter shapes, and which ones this go has covered.
+  let samples = []; // { x, y, letter }
+  let letterTotals = [];
+  let covered = new Uint8Array(0);
+  let reach = 10; // how close a trace must pass to count, in px
 
   const colour = () => RAINBOW[colourIndex];
 
@@ -82,7 +87,7 @@ export function setupRainbow(root, word, onDone) {
       ctx.font = `600 ${size}px ${font}`;
       measured = max;
     }
-    wordWidth = Math.max(measured, 80);
+    buildSamples(w, hgt, ctx.font, measured);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.lineWidth = 2;
@@ -94,15 +99,86 @@ export function setupRainbow(root, word, onDone) {
     ctx.setLineDash([]);
   }
 
+  // Draw the word on a hidden canvas and keep a grid of points that fall
+  // inside its letters, labelled with which letter each belongs to.
+  function buildSamples(w, hgt, font, wordWidth) {
+    const off = document.createElement("canvas");
+    off.width = Math.ceil(w);
+    off.height = Math.ceil(hgt);
+    const o = off.getContext("2d");
+    o.font = font;
+    o.textAlign = "left";
+    o.textBaseline = "middle";
+    const startX = (w - wordWidth) / 2;
+    o.fillText(word, startX, hgt / 2);
+    const edges = [...word].map((_, i) => startX + o.measureText(word.slice(0, i + 1)).width);
+    const img = o.getImageData(0, 0, off.width, off.height).data;
+    samples = [];
+    for (let y = 0; y < off.height; y += SAMPLE_STEP) {
+      for (let x = 0; x < off.width; x += SAMPLE_STEP) {
+        if (img[(y * off.width + x) * 4 + 3] > 128) {
+          let letter = edges.findIndex((e) => x < e);
+          if (letter < 0) letter = word.length - 1;
+          samples.push({ x, y, letter });
+        }
+      }
+    }
+    letterTotals = Array(word.length).fill(0);
+    for (const p of samples) letterTotals[p.letter] += 1;
+    covered = new Uint8Array(samples.length);
+    reach = Math.max(9, hgt * 0.07);
+  }
+
+  // Mark word points near the line from a to b as traced.
+  function cover(a, b) {
+    const minX = Math.min(a[0], b[0]) - reach, maxX = Math.max(a[0], b[0]) + reach;
+    const minY = Math.min(a[1], b[1]) - reach, maxY = Math.max(a[1], b[1]) + reach;
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    const len2 = dx * dx + dy * dy || 1;
+    for (let i = 0; i < samples.length; i++) {
+      if (covered[i]) continue;
+      const p = samples[i];
+      if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) continue;
+      const t = Math.max(0, Math.min(1, ((p.x - a[0]) * dx + (p.y - a[1]) * dy) / len2));
+      const ex = a[0] + t * dx - p.x, ey = a[1] + t * dy - p.y;
+      if (ex * ex + ey * ey <= reach * reach) covered[i] = 1;
+    }
+  }
+
+  function coverage() {
+    const perLetter = Array(word.length).fill(0);
+    let total = 0;
+    for (let i = 0; i < samples.length; i++) {
+      if (covered[i]) { total += 1; perLetter[samples[i].letter] += 1; }
+    }
+    const letters = perLetter.map((n, i) => (letterTotals[i] ? n / letterTotals[i] : 1));
+    return { word: samples.length ? total / samples.length : 0, letters };
+  }
+
+  // Progress towards a go, 0–1: limited by the overall trace and the least-traced letter.
+  function progress() {
+    const c = coverage();
+    const wordPart = Math.min(1, c.word / WORD_COVER);
+    const letterPart = Math.min(1, Math.min(...c.letters) / LETTER_COVER);
+    return Math.min(wordPart, letterPart);
+  }
+
   function chooseColour(i) {
     colourIndex = i;
-    drawnThisGo = 0;
+    covered = new Uint8Array(samples.length);
     updateMeter();
     root.querySelectorAll(".swatch").forEach((s, n) => s.classList.toggle("chosen", n === i));
   }
 
   function updateMeter() {
-    const pct = goes >= NEEDED ? 100 : Math.min(100, (drawnThisGo / (wordWidth * GO_LENGTH)) * 100);
+    // The bar fills steadily as each letter is traced (an average across letters),
+    // while a go only counts when every letter has been traced.
+    let pct = 100;
+    if (goes < NEEDED) {
+      const c = coverage();
+      const letters = c.letters.reduce((sum, v) => sum + Math.min(1, v / LETTER_COVER), 0) / c.letters.length;
+      pct = Math.round(Math.min(Math.min(1, c.word / WORD_COVER), letters) * 100);
+    }
     meter.style.width = `${pct}%`;
     meter.style.background = colour().hex;
   }
@@ -123,7 +199,6 @@ export function setupRainbow(root, word, onDone) {
 
   function completeGo() {
     goes += 1;
-    waitForLift = true;
     pop.textContent = "⭐";
     pop.classList.remove("show");
     void pop.offsetWidth;
@@ -142,7 +217,6 @@ export function setupRainbow(root, word, onDone) {
 
   canvas.addEventListener("pointerdown", (e) => {
     drawing = true;
-    waitForLift = false;
     canvas.setPointerCapture(e.pointerId);
     ctx.strokeStyle = colour().hex;
     ctx.lineWidth = Math.max(6, canvas.clientHeight * 0.05);
@@ -152,22 +226,31 @@ export function setupRainbow(root, word, onDone) {
     last = point(e);
     ctx.beginPath();
     ctx.moveTo(...last);
+    if (goes < NEEDED) cover(last, last);
   });
   canvas.addEventListener("pointermove", (e) => {
     if (!drawing) return;
     const p = point(e);
     ctx.lineTo(...p);
     ctx.stroke();
-    if (goes < NEEDED && !waitForLift) {
-      drawnThisGo += Math.hypot(p[0] - last[0], p[1] - last[1]);
+    if (goes < NEEDED) {
+      cover(last, p);
       updateMeter();
-      if (drawnThisGo >= wordWidth * GO_LENGTH) completeGo();
     }
     last = p;
   });
+  // A go is checked when the finger lifts, so the child can take as many
+  // strokes as they need (one per letter is fine) before it counts.
   const end = () => {
+    if (!drawing) return;
     drawing = false;
     ctx.globalAlpha = 1;
+    if (goes >= NEEDED) return;
+    if (progress() >= 1) completeGo();
+    else if (coverage().word > 0.15) {
+      const left = coverage().letters.findIndex((v) => v < LETTER_COVER);
+      if (left >= 0) countEl.textContent = `Keep going – trace the “${word[left]}” too.`;
+    }
   };
   canvas.addEventListener("pointerup", end);
   canvas.addEventListener("pointercancel", end);
