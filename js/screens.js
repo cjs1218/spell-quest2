@@ -5,7 +5,8 @@ import {
   updateProfile, deleteProfile, AVATARS, seeds, garden, setLastGroup, lastGroup, mistakeCounts,
   mistakeLog, schoolList, setSchoolList,
 } from "./store.js";
-import { say, canSpeak } from "./speech.js";
+import { say, cheer, canSpeak, stop, availableVoices, onVoicesChanged } from "./speech.js";
+import { sound } from "./sounds.js";
 import { chunks, syllabify } from "./syllables.js";
 import { getGroups, getGroup, findFamily, allWords, schoolGroup } from "./groups.js";
 import { MISTAKE_TYPES } from "./mistakes.js";
@@ -197,6 +198,14 @@ export function profilesScreen() {
 
 // ---------- settings ----------
 
+function voiceOptions(chosen) {
+  const voices = availableVoices();
+  const natural = (v) => /natural|neural|premium|enhanced|online/i.test(v.name);
+  const label = (v) => `${natural(v) ? "⭐ " : ""}${v.name.replace(/^(Microsoft|Google)\s+/, "").replace(/\s*\(.*?\)\s*/g, " ").trim()} (${v.lang})`;
+  return `<option value="" ${!chosen ? "selected" : ""}>Best available (automatic)</option>` +
+    voices.map((v) => `<option value="${esc(v.name)}" ${v.name === chosen ? "selected" : ""}>${esc(label(v))}</option>`).join("");
+}
+
 export function settingsScreen() {
   const s = getSettings();
   const opt = (name, value, label) =>
@@ -216,9 +225,23 @@ export function settingsScreen() {
     <fieldset class="card"><legend>Text size</legend>
       ${opt("textSize", 1, "Medium")}${opt("textSize", 1.15, "Large")}${opt("textSize", 1.35, "Extra large")}
     </fieldset>
+    <fieldset class="card"><legend>Voice</legend>
+      ${canSpeak() ? h`
+        <label class="field">Choose a voice
+          <select id="voice">${voiceOptions(s.voice)}</select>
+        </label>
+        <button class="btn" id="try-voice">🔊 Try this voice</button>
+        <p class="muted small">Voices marked ⭐ sound the most natural. On iPad and iPhone you can download nicer voices in Settings → Accessibility → Spoken Content → Voices → English (UK).</p>
+      ` : `<p class="muted">This device can't talk, so sound is switched off.</p>`}
+    </fieldset>
+    <fieldset class="card"><legend>Voice style</legend>
+      ${opt("lively", true, "Lively and excited 🎉")}${opt("lively", false, "Calm")}
+    </fieldset>
     <fieldset class="card"><legend>Talking speed</legend>
       ${opt("speechRate", 0.65, "Slow")}${opt("speechRate", 0.8, "Steady")}${opt("speechRate", 1, "Normal")}
-      ${canSpeak() ? "" : `<p class="muted">This device can't talk, so sound is switched off.</p>`}
+    </fieldset>
+    <fieldset class="card"><legend>Sound effects</legend>
+      ${opt("sounds", true, "On 🔔")}${opt("sounds", false, "Off")}
     </fieldset>
     <fieldset class="card"><legend>Calm mode</legend>
       ${opt("calm", false, "Off")}${opt("calm", true, "On – fewer animations")}
@@ -227,10 +250,30 @@ export function settingsScreen() {
 
   on("input[type=radio]", "change", (e) => {
     const { name, value } = e.target;
-    const v = ["textSize", "speechRate"].includes(name) ? Number(value) : name === "calm" ? value === "true" : value;
+    const v = ["textSize", "speechRate"].includes(name) ? Number(value)
+      : ["calm", "lively", "sounds"].includes(name) ? value === "true" : value;
     saveSettings({ [name]: v });
     applySettings();
+    stop();
     if (name === "speechRate") say("This is how fast I talk.");
+    if (name === "lively") cheer(v ? "Hooray! Brilliant spelling!" : "Well done. Brilliant spelling.");
+    if (name === "sounds" && v) sound("correct");
+  });
+  on("#voice", "change", (e) => {
+    saveSettings({ voice: e.target.value || null });
+    stop();
+    cheer("Hello! I'm Hazel. Let's grow some words!");
+  });
+  on("#try-voice", "click", () => {
+    stop();
+    sound("correct");
+    cheer(`Fantastic spelling, ${currentProfile().name}! You're a star!`);
+  });
+  // Voices sometimes load a moment after the page.
+  const off = onVoicesChanged(() => {
+    const sel = app.querySelector("#voice");
+    if (sel) sel.innerHTML = voiceOptions(getSettings().voice);
+    else off();
   });
   on("#reset-settings", "click", () => {
     saveSettings(DEFAULT_SETTINGS);

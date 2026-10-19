@@ -14,6 +14,9 @@ export const DEFAULT_SETTINGS = {
   spacing: "wide", // normal | wide
   speechRate: 0.8,
   calm: false, // fewer animations
+  lively: true, // excited voice for praise
+  sounds: true, // celebration sound effects
+  voice: null, // chosen voice name, or null for the best available
 };
 
 export const AVATARS = ["🦊", "🐰", "🐻", "🐼", "🐸", "🐯", "🦄", "🐙", "🐝", "🐢", "🦉", "🐶"];

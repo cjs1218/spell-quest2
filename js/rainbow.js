@@ -4,7 +4,8 @@
 // Three stars show how many goes are done; each one fills when a go is finished.
 
 import { esc, h, on } from "./ui.js";
-import { say } from "./speech.js";
+import { say, cheer } from "./speech.js";
+import { sound } from "./sounds.js";
 import { praise, spoken } from "./praise.js";
 
 export const RAINBOW = [
@@ -207,7 +208,8 @@ export function setupRainbow(root, word, onDone) {
     void pop.offsetWidth;
     pop.classList.add("show");
     lastCheer = goes >= NEEDED ? praise("rainbow") : praise("star");
-    say(spoken(goes >= NEEDED ? lastCheer.split("!")[0] + "!" : `${lastCheer} ${goes === 1 ? "One!" : "Two!"}`));
+    sound(goes >= NEEDED ? "fanfare" : "star");
+    cheer(spoken(goes >= NEEDED ? lastCheer.split("!")[0] + "!" : `${lastCheer} ${goes === 1 ? "That's one!" : "That's two!"}`));
     // Move on to the next rainbow colour automatically.
     if (goes < NEEDED) chooseColour((colourIndex + 1) % RAINBOW.length);
     updateMeter();

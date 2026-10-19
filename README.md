@@ -73,6 +73,11 @@ Following the [British Dyslexia Association style guide](https://www.bdadyslexia
 - Lexend or Atkinson Hyperlegible fonts, adjustable size and letter spacing
 - No italics, no timers, no lives, no clutter
 - Audio for every word, with adjustable speed
+- A lively, excited voice for praise and a gentle one for encouragement, while
+  words are taught slowly and clearly. The most natural-sounding British voice on
+  the device is picked automatically, or choose one in Settings
+- Happy sound effects (made in code, no audio files), with a soft "hmm" rather
+  than a buzzer for mistakes
 - Large tap targets, works on tablets and phones, respects reduced-motion settings
 
 ## Privacy
@@ -121,7 +126,8 @@ js/words.js            word lists grouped into families, plus memory tricks
 js/syllables.js        syllable splits, plus automatic splitting for new words
 js/pictures.js         picture clues
 js/builder.js          word-building challenges
-js/speech.js           British English text-to-speech
+js/speech.js           British English text-to-speech (teaching, cheerful and gentle styles)
+js/sounds.js           celebration sound effects
 tools/check-words.mjs  checks every word appears once and has syllables
 ```
 

@@ -480,3 +480,4 @@ details summary { cursor: pointer; }
 @keyframes go-pop { 0% { opacity: 0; transform: scale(0.4); } 30% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(1) translateY(-30px); } }
 .go-meter { height: 0.5rem; border-radius: 1rem; background: var(--line); overflow: hidden; margin: 0.5rem 0 0; }
 .go-meter span { display: block; height: 100%; width: 0; border-radius: 1rem; transition: width 0.1s; }
+select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem; font: inherit; font-weight: 400; border-radius: 0.8rem; border: 2px solid var(--line); background: var(--card); color: var(--text); }

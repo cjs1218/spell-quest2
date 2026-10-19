@@ -2,7 +2,8 @@
 
 import { MNEMONICS } from "./words.js";
 import { wordState, isDue, recordAttempt, MASTERED_BOX, garden } from "./store.js";
-import { say, sayLetter, stop } from "./speech.js";
+import { say, sayLetter, stop, cheer, warm } from "./speech.js";
+import { sound } from "./sounds.js";
 import { chunks } from "./syllables.js";
 import { picture } from "./pictures.js";
 import { MISTAKE_TYPES } from "./mistakes.js";
@@ -82,6 +83,7 @@ function learnStep(session) {
     <button class="btn primary big" id="ready">I'm ready! Hide the word</button>
     <div id="overlay"></div>`;
 
+  stop();
   say(word);
   on("#hear", "click", () => say(word));
   on("#sos", "click", async (e) => {
@@ -198,7 +200,8 @@ function feedbackStep(session, attempt, answer) {
         ${comment}
         <button class="btn primary big" id="next">Next</button>
       </div>`;
-    say(spoken(headline));
+    sound(result?.mastered ? "fanfare" : "correct");
+    cheer(`${spoken(headline)} ${app.querySelector(".bubble")?.textContent || ""}`);
     on("#next", "click", () => nextWord(session));
     return;
   }
@@ -222,7 +225,9 @@ function feedbackStep(session, attempt, answer) {
         <button class="btn ${attempt === 1 ? "" : "primary"}" id="next">${attempt === 1 ? "Skip for now" : "Next word"}</button>
       </div>
     </div>`;
-  on("#hear", "click", () => say(word));
+  sound("oops");
+  warm(app.querySelector(".bubble")?.textContent || "");
+  on("#hear", "click", () => { stop(); say(word); });
   on("#again", "click", () => learnStepRetry(session));
   on("#retry", "click", () => attemptStep(session, 2));
   on("#next", "click", () => nextWord(session));
@@ -260,6 +265,7 @@ function endScreen(session) {
         <a class="btn" href="#/year/${session.groupKey}">Back</a>
       </div>
     </div>`;
-  say(spoken(headline) + (missionDone ? " You finished your weekly mission!" : ""));
+  sound("fanfare");
+  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : app.querySelector(".bubble")?.textContent || ""}`);
   on("#again", "click", () => startSession(session.fam, session.groupKey));
 }
