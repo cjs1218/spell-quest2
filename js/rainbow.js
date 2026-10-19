@@ -7,6 +7,7 @@ import { esc, h, on } from "./ui.js";
 import { say, cheer } from "./speech.js";
 import { sound } from "./sounds.js";
 import { praise, spoken } from "./praise.js";
+import { withSayButton, readInstruction } from "./readaloud.js";
 
 export const RAINBOW = [
   { name: "red", hex: "#e53935" },
@@ -31,7 +32,7 @@ const starsHtml = (done) =>
 export function rainbowHtml(word) {
   return h`
     <div class="rainbow">
-      <p class="step-label">Trace over <strong>${esc(word)}</strong> 3 times, in 3 colours</p>
+      <p class="step-label speakable">${withSayButton(`Trace over <strong>${esc(word)}</strong> 3 times, in 3 colours`)}</p>
       <div class="stars" role="img" aria-label="0 of ${NEEDED} done">${starsHtml(0)}</div>
       <div class="canvas-wrap">
         <canvas class="rainbow-canvas" aria-label="Tracing area for ${esc(word)}"></canvas>
@@ -297,5 +298,6 @@ export function setupRainbow(root, word, onDone) {
   chooseColour(0);
   updateText();
   requestAnimationFrame(() => { drawGuide(); updateMeter(); });
+  readInstruction("Trace over the word with your finger. Do it three times, in three colours.");
   say(word);
 }

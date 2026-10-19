@@ -2,7 +2,7 @@ import { MNEMONICS, YEAR_GROUPS } from "./words.js";
 import {
   getSettings, saveSettings, DEFAULT_SETTINGS, wordState, isDue, summary, growth, daysPractised,
   comebacks, resetProgress, MASTERED_BOX, profiles, currentProfile, switchProfile, addProfile,
-  updateProfile, deleteProfile, AVATARS, seeds, garden, setLastGroup, lastGroup, mistakeCounts,
+  updateProfile, deleteProfile, AVATARS, YEARS, grewToday, seeds, garden, setLastGroup, lastGroup, mistakeCounts,
   mistakeLog, schoolList, setSchoolList,
 } from "./store.js";
 import { say, cheer, canSpeak, stop, availableVoices, onVoicesChanged } from "./speech.js";
@@ -15,6 +15,9 @@ import { companionHtml } from "./companion.js";
 import { gamesFor } from "./games.js";
 import { startSession } from "./practice.js";
 import { picture } from "./pictures.js";
+import { todaysPlan, todayFamily } from "./today.js";
+import { needsSafetyReminder, dismissSafetyReminder, keepSafeHtml, setupKeepSafe } from "./backup.js";
+import { lock } from "./gate.js";
 import { app, h, esc, on, go, header, applySettings, PLANTS, seedBadge, toast } from "./ui.js";
 
 const plantFor = (box) => (box >= MASTERED_BOX ? garden().flower : PLANTS[box]);
@@ -45,30 +48,35 @@ export function homeScreen() {
   const mission = currentMission();
   const sugg = suggestion();
   const school = groups.school;
+  const plan = todaysPlan();
 
-  const yearCards = Object.entries(YEAR_GROUPS).map(([key, g]) => {
+  const yearRows = Object.entries(YEAR_GROUPS).map(([key, g]) => {
     const gr = growth(allWords(g));
     return h`
-      <a class="card year-card" href="#/year/${key}">
-        <div class="year-row"><h2>${g.label}</h2><span class="muted">${gr.pct}% grown</span></div>
-        <div class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></div>
-        <p class="muted small">${growthLine(gr)}</p>
+      <a class="year-row-link" href="#/year/${key}">
+        <span class="yr-name">${g.label}</span>
+        <span class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></span>
+        <span class="muted small nowrap">${gr.pct}%</span>
       </a>`;
   });
 
   const plantsPreview = Object.values(groups).flatMap(allWords)
     .filter((w, i, a) => a.indexOf(w) === i && wordState(w).box > 0)
     .sort((a, b) => wordState(b).box - wordState(a).box)
-    .slice(0, 24)
+    .slice(0, 18)
     .map((w) => plantFor(wordState(w).box)).join("");
 
-  const schoolCard = school ? (() => {
+  const todayDetail = plan.words.length
+    ? [plan.reviewCount ? `💧 ${plan.reviewCount} to water` : "", plan.newCount ? `🌱 ${plan.newCount} new` : ""].filter(Boolean).join(" · ")
+    : "";
+
+  const schoolRow = school ? (() => {
     const gr = growth(allWords(school));
     return h`
-      <a class="card school-card" href="#/family/school">
-        <div class="year-row"><h2>📝 ${esc(school.label)}</h2><span class="muted">${gr.pct}% grown</span></div>
-        <div class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></div>
-        <p class="muted small">${gr.steps ? growthLine(gr) : "This week's spellings from school"}</p>
+      <a class="year-row-link school" href="#/family/school">
+        <span class="yr-name">📝 ${esc(school.label)}</span>
+        <span class="meter" aria-hidden="true"><span style="width:${gr.pct}%"></span></span>
+        <span class="muted small nowrap">${gr.pct}%</span>
       </a>`;
   })() : "";
 
@@ -79,29 +87,57 @@ export function homeScreen() {
       <a class="icon-btn" href="#/settings" aria-label="Settings">⚙️</a>
     </header>
     ${sugg
-      ? `<div class="companion" role="status"><span class="hedgehog" aria-hidden="true">🦔</span><p class="bubble">Hi ${esc(me.name)}! ${esc(MISTAKE_TYPES[sugg.type].label)} have been a bit tricky. Shall we practise <a href="#/family/${sugg.fam.id}">${esc(sugg.fam.name)}</a>?</p></div>`
+      ? `<div class="companion" role="status"><span class="hedgehog" aria-hidden="true">🦔</span><p class="bubble speakable"><span class="say-text">Hi ${esc(me.name)}! ${esc(MISTAKE_TYPES[sugg.type].label)} have been a bit tricky. Shall we practise <a href="#/family/${sugg.fam.id}">${esc(sugg.fam.name)}</a>?</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p></div>`
       : companionHtml("greet")}
 
-    <a class="card garden-card" href="#/garden">
-      <div class="year-row"><h2>🏡 My garden</h2><span class="seed-pill">🌰 ${seeds()}</span></div>
-      <p class="garden">${plantsPreview || '🟫🟫🟫 <span class="garden-empty">Plant your first word!</span>'}</p>
-    </a>
+    ${plan.words.length ? h`
+      <a class="today-btn" href="#/today">
+        <span class="today-icon" aria-hidden="true">🌱</span>
+        <span><strong>Today's words</strong><small>${todayDetail}</small></span>
+      </a>` : h`
+      <div class="today-btn done" role="status">
+        <span class="today-icon" aria-hidden="true">💧</span>
+        <span><strong>All watered for today!</strong><small>Your plants grow again tomorrow. Try a game or pick a family below.</small></span>
+      </div>`}
 
-    <div class="card mission-card ${mission.done ? "done" : ""}">
-      <div class="year-row"><h2>🏅 This week's mission</h2><span class="muted">${mission.progress}/${mission.target}</span></div>
-      <p>${esc(mission.text)}${mission.done ? " – complete! 🎉" : ""}</p>
-      <div class="meter" aria-hidden="true"><span style="width:${(mission.progress / mission.target) * 100}%"></span></div>
-      ${mission.kind === "grow" && !mission.done ? `<a class="small-link" href="#/family/${mission.familyId}">Go to this family →</a>` : ""}
+    ${needsSafetyReminder() ? h`
+      <div class="card safety-card">
+        <p class="small"><strong>Grown-ups:</strong> add Spell Quest to the Home Screen so Safari doesn't clear the garden after a week away.</p>
+        <div class="row left"><a class="btn" href="#/grown-ups">Show me how</a><button class="btn subtle" id="dismiss-safety">Hide</button></div>
+      </div>` : ""}
+
+    <div class="home-pair">
+      <a class="card garden-card" href="#/garden">
+        <div class="year-row"><h2>🏡 Garden</h2><span class="seed-pill">🌰 ${seeds()}</span></div>
+        <p class="garden">${plantsPreview || '<span class="garden-empty">Plant your first word!</span>'}</p>
+      </a>
+      <div class="card mission-card ${mission.done ? "done" : ""}">
+        <h2>🏅 Mission</h2>
+        <p class="small">${esc(mission.text)}${mission.done ? " 🎉" : ""}</p>
+        <div class="meter" aria-hidden="true"><span style="width:${(mission.progress / mission.target) * 100}%"></span></div>
+        <p class="muted small">${mission.progress} of ${mission.target}</p>
+      </div>
     </div>
 
-    ${schoolCard}
-    ${yearCards.join("")}
+    <section class="card families-card">
+      <h2>Choose a family</h2>
+      ${schoolRow}
+      ${yearRows.join("")}
+    </section>
 
     <section class="badges" aria-label="Your badges">
       ${daysPractised() ? `<span class="badge">🗓️ Practised on ${daysPractised()} day${daysPractised() === 1 ? "" : "s"}</span>` : ""}
       ${comebacks() ? `<span class="badge">💪 ${comebacks()} comeback word${comebacks() === 1 ? "" : "s"}</span>` : ""}
     </section>
-    <a class="small-link" href="#/grown-ups">For grown-ups</a>`;
+    <a class="small-link" href="#/grown-ups">🔒 For grown-ups</a>`;
+
+  on("#dismiss-safety", "click", () => { dismissSafetyReminder(); homeScreen(); });
+}
+
+export function todayScreen() {
+  const fam = todayFamily();
+  if (!fam.words.length) return go("#/");
+  startSession(fam, "today");
 }
 
 // "🌻 2 grown · 🌱 3 growing" – counts every stage, not just full flowers.
@@ -169,6 +205,7 @@ export function familyScreen(id) {
           <button class="hear" data-word="${esc(w)}" aria-label="Hear ${esc(w)}">🔊</button>
           <span class="word">${chunks(w).map(esc).join('<span class="dot-sep" aria-hidden="true">·</span>')}</span>
           ${picture(w) ? `<span class="pic-small" aria-hidden="true">${picture(w)}</span>` : ""}
+          ${grewToday(w) ? `<span class="watered" title="Grown today – it grows again tomorrow" aria-label="Watered today">💧</span>` : ""}
           ${pipsHtml(w)}
           <span aria-hidden="true">${plantFor(wordState(w).box)}</span>
         </li>`).join("")}
@@ -177,6 +214,10 @@ export function familyScreen(id) {
   on(".hear", "click", (e) => say(e.currentTarget.dataset.word));
   on("#start", "click", () => startSession(fam, groupKey));
 }
+
+const yearOptions = (chosen) =>
+  `<option value="" ${!chosen ? "selected" : ""}>Not set</option>` +
+  Object.entries(YEARS).map(([k, label]) => `<option value="${k}" ${k === chosen ? "selected" : ""}>${label}</option>`).join("");
 
 // ---------- profiles (sibling support) ----------
 
@@ -193,6 +234,7 @@ export function profilesScreen() {
       <label class="field">Name <input id="pname" maxlength="20" autocomplete="off" /></label>
       <p class="muted">Pick a picture:</p>
       <div class="avatar-pick">${AVATARS.map((a, i) => `<label><input type="radio" name="av" value="${a}" ${i === 0 ? "checked" : ""}/><span>${a}</span></label>`).join("")}</div>
+      <label class="field">School year <select id="pyear">${yearOptions(null)}</select></label>
       <button class="btn primary" id="add">Add</button>
     </details>
     <p class="muted small">Each child gets their own garden, progress and settings on this device. Grown-ups can rename or remove children on the grown-ups page.</p>`;
@@ -206,7 +248,7 @@ export function profilesScreen() {
   on("#add", "click", () => {
     const name = app.querySelector("#pname").value.trim();
     if (!name) return toast("Type a name first");
-    addProfile(name, app.querySelector("input[name=av]:checked").value);
+    addProfile(name, app.querySelector("input[name=av]:checked").value, app.querySelector("#pyear").value || null);
     sessionStorage.setItem("spellquest.picked", "1");
     applySettings();
     go("#/");
@@ -260,6 +302,10 @@ export function settingsScreen() {
     <fieldset class="card"><legend>Sound effects</legend>
       ${opt("sounds", true, "On 🔔")}${opt("sounds", false, "Off")}
     </fieldset>
+    <fieldset class="card"><legend>Read instructions aloud</legend>
+      ${opt("readAloud", true, "On 🔊")}${opt("readAloud", false, "Off")}
+      <p class="muted small">Instructions are read out the first time they appear. Every 🔊 button reads its words out.</p>
+    </fieldset>
     <fieldset class="card"><legend>Calm mode</legend>
       ${opt("calm", false, "Off")}${opt("calm", true, "On – fewer animations")}
     </fieldset>
@@ -268,7 +314,7 @@ export function settingsScreen() {
   on("input[type=radio]", "change", (e) => {
     const { name, value } = e.target;
     const v = ["textSize", "speechRate"].includes(name) ? Number(value)
-      : ["calm", "lively", "sounds"].includes(name) ? value === "true" : value;
+      : ["calm", "lively", "sounds", "readAloud"].includes(name) ? value === "true" : value;
     saveSettings({ [name]: v });
     applySettings();
     stop();
@@ -340,8 +386,10 @@ export function grownUpsScreen() {
   }).join("") : `<p class="muted">No mistakes recorded yet. Patterns will appear here as ${esc(me.name)} practises.</p>`;
 
   app.innerHTML = h`
-    ${header("#/", "For grown-ups")}
+    ${header("#/", "For grown-ups", `<button class="icon-btn" id="lock" aria-label="Lock grown-ups area">🔒</button>`)}
     <p class="muted">Showing <strong>${me.avatar} ${esc(me.name)}</strong>. <a href="#/profiles">Switch child</a></p>
+
+    ${keepSafeHtml()}
 
     <section class="card">
       <h2>📝 School spelling list</h2>
@@ -371,10 +419,12 @@ export function grownUpsScreen() {
 
     <section class="card">
       <h2>👧👦 Children on this device</h2>
+      <p class="muted small">The school year decides which new words appear in "Today's words".</p>
       ${profiles().map((p) => h`
         <div class="manage-row">
           <span class="profile-avatar small" aria-hidden="true">${p.avatar}</span>
           <input class="rename" data-id="${p.id}" value="${esc(p.name)}" maxlength="20" aria-label="Name" />
+          <select class="year-select" data-id="${p.id}" aria-label="School year for ${esc(p.name)}">${yearOptions(p.year)}</select>
           ${profiles().length > 1 ? `<button class="btn subtle remove" data-id="${p.id}" aria-label="Remove ${esc(p.name)}">🗑️</button>` : ""}
         </div>`).join("")}
       <a class="btn" href="#/profiles">➕ Add a child</a>
@@ -386,13 +436,23 @@ export function grownUpsScreen() {
         <li>Words are grouped into spelling families from the National Curriculum Year 1–2 common exception words and Year 3–6 statutory lists.</li>
         <li>Each word is seen, heard, chopped into syllables and spelt aloud letter by letter (Simultaneous Oral Spelling) before it's hidden.</li>
         <li>Help fades as a word grows: syllable chunks, then letter tiles, then typing. "Show me again" is always available with no penalty.</li>
-        <li>Spaced repetition brings words back after 1, 2, 4 and 7 days. A mistake moves a word back one step, never to the start.</li>
+        <li>Spaced repetition brings words back after 1, 2, 4 and 7 days. A word can only grow one step a day; extra practice the same day counts as watering. A mistake moves a word back one step, never to the start.</li>
+        <li>"Today's words" picks words that are due again from every year, then new words from the school list and the child's year.</li>
         <li>Mistakes are sorted into patterns (double letters, silent letters, vowels, letter order, endings) to suggest what to practise next.</li>
         <li>No timers, no lives, no ads, no accounts. Everything is stored only on this device.</li>
       </ul>
     </section>
     <button class="btn subtle" id="reset">Reset ${esc(me.name)}'s progress</button>`;
 
+  setupKeepSafe(app, (restored) => {
+    if (restored) { applySettings(); schoolGroup(); }
+    grownUpsScreen();
+  });
+  on("#lock", "click", () => { lock(); go("#/"); });
+  on(".year-select", "change", (e) => {
+    updateProfile(e.target.dataset.id, { year: e.target.value });
+    toast("School year saved");
+  });
   on(".rename", "change", (e) => {
     updateProfile(e.target.dataset.id, { name: e.target.value });
     toast("Name saved");

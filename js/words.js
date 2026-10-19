@@ -125,7 +125,7 @@ export const YEAR_GROUPS = {
         id: "y2-tricky-b",
         name: "Tricky words – set B",
         tip: "Chop them into beats and say each part: peo-ple, wa-ter.",
-        words: ["clothes", "busy", "people", "water", "again", "half", "money", "parent", "Christmas", "Mr", "Mrs"],
+        words: ["clothes", "busy", "people", "water", "again", "half", "money", "parents", "Christmas", "Mr", "Mrs"],
       },
     ],
   },

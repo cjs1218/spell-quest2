@@ -5,11 +5,12 @@ import { getGroup, allWords, patternFamilies } from "./groups.js";
 import { addSeeds, recordGamePlayed, SEEDS, wordState, MASTERED_BOX, recordAttempt } from "./store.js";
 import { checkMission } from "./mission.js";
 import { chunks } from "./syllables.js";
-import { picture } from "./pictures.js";
+import { gamePicture as picture } from "./pictures.js";
 import { BUILDS, DISTRACTORS } from "./builder.js";
 import { say, stop, cheer, warm } from "./speech.js";
 import { sound } from "./sounds.js";
 import { companionHtml } from "./companion.js";
+import { instructionHtml, readInstruction, withSayButton } from "./readaloud.js";
 import { praise, spoken } from "./praise.js";
 import { rainbowHtml, setupRainbow } from "./rainbow.js";
 import {
@@ -57,8 +58,10 @@ function frame(ctx, body, label = "") {
       ${label === "nodots" ? `<h1>${ctx.game.name}</h1>` : dots}
       ${seedBadge()}
     </header>
-    ${label && label !== "nodots" ? `<p class="step-label">${label}</p>` : ""}
+    ${label && label !== "nodots" ? instructionHtml(label) : ""}
     ${body}`;
+  // Read the instruction aloud (only when it's new, so it isn't repeated every round).
+  if (label && label !== "nodots") readInstruction(`${label}.`);
 }
 
 function win(ctx, seedsForRound = SEEDS.game) {
@@ -122,10 +125,11 @@ function sortGame(ctx) {
   let firstTry = true;
 
   frame(ctx, h`
-    <p class="step-label">Tap a word, then tap the basket it belongs in.</p>
+    ${instructionHtml("Tap a word, then tap the basket it belongs in.")}
     <div class="chips" id="chips">${words.map((x, i) => `<button class="chip" data-i="${i}">${esc(x.w)}</button>`).join("")}</div>
     <div class="baskets">${fams.map((f, fi) => `<button class="basket" data-fi="${fi}"><strong>🧺 ${esc(f.name)}</strong><span class="basket-words"></span></button>`).join("")}</div>
     <div id="msg"></div>`, "nodots");
+  readInstruction("Tap a word, then tap the basket it belongs in.");
 
   on(".chip", "click", (e) => {
     selected = e.currentTarget;
@@ -247,9 +251,10 @@ function buildGame(ctx) {
       : `${esc(b.prefix ? b.add.join(" + ") + " + " + b.base : [b.base, ...b.add].join(" + "))} = ${esc(b.word)}. ${esc(b.rule || "")}`);
     const step = app.querySelector("#step2");
     step.innerHTML = h`
-      <p class="step-label">Now build the whole word</p>
+      ${instructionHtml("Now build the whole word")}
       ${tilesHtml(b.word, [...b.word])}
       <button class="btn primary big" id="check" disabled>Check</button>`;
+    readInstruction("Now build the whole word.");
     const check = step.querySelector("#check");
     const get = setupTiles(step, b.word.length, { onChange: (full) => (check.disabled = !full) });
     check.addEventListener("click", () => {

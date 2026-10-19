@@ -491,3 +491,62 @@ select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem
 .pip { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--line); }
 .pip.on { background: var(--good); }
 .nowrap { white-space: nowrap; }
+
+/* ---------- v5: Today's words, read aloud, alignment, lock ---------- */
+
+.today-btn {
+  display: flex; align-items: center; gap: 0.9rem; margin: 0 0 1rem; padding: 1.1rem 1.2rem;
+  border-radius: 1.2rem; background: var(--accent); color: var(--accent-text); text-decoration: none;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 65%, #000);
+}
+.today-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 65%, #000); }
+.today-btn strong { display: block; font-size: 1.35rem; }
+.today-btn small { display: block; opacity: 0.9; }
+.today-btn.done { background: var(--card); color: var(--text); border: 2px solid var(--line); box-shadow: none; }
+.today-icon { font-size: 2.6rem; line-height: 1; }
+
+.home-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.home-pair .card { margin-bottom: 0.9rem; padding: 0.8rem 0.9rem; }
+.home-pair h2 { font-size: 1.05rem; }
+.home-pair .garden { font-size: 1.15rem; }
+.home-pair .seed-pill { font-size: 0.8rem; padding: 0.15rem 0.5rem; }
+@media (max-width: 360px) { .home-pair { grid-template-columns: 1fr; } }
+
+.families-card h2 { margin-bottom: 0.4rem; }
+.year-row-link {
+  display: grid; grid-template-columns: minmax(6.5rem, auto) 1fr auto; align-items: center; gap: 0.6rem;
+  padding: 0.65rem 0.2rem; border-bottom: 2px solid var(--line); text-decoration: none; font-weight: 600;
+}
+.year-row-link:last-child { border-bottom: none; }
+.year-row-link .meter { margin: 0; }
+.year-row-link.school .yr-name { color: var(--accent); }
+
+.safety-card { border-color: var(--fix); }
+
+/* Read-aloud buttons */
+.speakable { position: relative; }
+.say-btn {
+  display: inline-grid; place-items: center; width: 2rem; height: 2rem; margin-left: 0.4rem; vertical-align: middle;
+  border-radius: 50%; border: 2px solid var(--line); background: var(--card); font-size: 0.9rem; cursor: pointer; padding: 0;
+}
+.bubble .say-btn { float: right; margin: -0.2rem -0.3rem 0 0.4rem; }
+.tip.speakable { align-items: center; }
+.tip .say-btn { margin-left: auto; flex: none; }
+
+/* Mistake feedback */
+.difference { text-align: center; font-weight: 600; font-size: 1.1rem; margin: 0.25rem 0 0.5rem; }
+.yours mark { background: var(--fix-bg); color: var(--fix); border-radius: 0.25em; padding: 0 0.08em; }
+.yours mark.extra { text-decoration: line-through; text-decoration-thickness: 2px; }
+.big-word .letter.missing { outline: 3px dashed var(--fix); outline-offset: -3px; }
+
+/* Grown-ups lock */
+.gate { text-align: center; }
+.gate-icon { font-size: 3rem; margin: 0; }
+.gate-q { text-align: left; font-size: 1.15rem; }
+.gate-q input { font-size: 1.4rem; text-align: center; }
+
+.watered { font-size: 0.95rem; }
+.manage-row { flex-wrap: wrap; }
+.manage-row .year-select { width: auto; flex: 0 0 auto; margin-top: 0; }
+#keep-safe ol { padding-left: 1.3rem; }
+[hidden] { display: none !important; }

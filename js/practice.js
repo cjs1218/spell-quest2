@@ -1,7 +1,9 @@
 // The core practice flow: look & listen → spell → gentle feedback.
 
 import { MNEMONICS } from "./words.js";
-import { wordState, isDue, recordAttempt, MASTERED_BOX, garden } from "./store.js";
+import { wordState, isDue, recordAttempt, MASTERED_BOX, garden, grewToday } from "./store.js";
+import { alignSpelling, describeDifference } from "./align.js";
+import { instructionHtml, readInstruction, withSayButton } from "./readaloud.js";
 import { say, sayLetter, stop, cheer, warm } from "./speech.js";
 import { sound } from "./sounds.js";
 import { chunks } from "./syllables.js";
@@ -13,27 +15,41 @@ import { praise, spoken } from "./praise.js";
 import { rainbowHtml, setupRainbow } from "./rainbow.js";
 import {
   app, h, esc, on, shuffle, sleep, PLANTS, chunkedWordHtml, beatsLabel,
-  tilesHtml, setupTiles, toast, seedBadge,
+  tilesHtml, setupTiles, toast, seedBadge, go,
 } from "./ui.js";
 
 const SESSION_SIZE = 5;
 const plantFor = (box) => (box >= MASTERED_BOX ? garden().flower : PLANTS[box]);
 
+// Due words first, then new ones, then the rest; words that already grew
+// today come last because they're resting until tomorrow.
 function pickSessionWords(fam) {
-  const due = fam.words.filter((w) => isDue(w));
+  const due = fam.words.filter((w) => isDue(w) && !grewToday(w));
   const fresh = fam.words.filter((w) => wordState(w).seen === 0);
   let picked = [...new Set([...shuffle(due), ...fresh])].slice(0, SESSION_SIZE);
   if (picked.length < SESSION_SIZE) {
-    const rest = shuffle(fam.words.filter((w) => !picked.includes(w)));
+    const rest = shuffle(fam.words.filter((w) => !picked.includes(w)))
+      .sort((a, b) => Number(grewToday(a)) - Number(grewToday(b)));
     picked = [...picked, ...rest].slice(0, SESSION_SIZE);
   }
   return picked;
 }
 
 export function startSession(fam, groupKey, words = null) {
-  const session = { fam, groupKey, words: words || pickSessionWords(fam), index: 0, results: [], streak: 0 };
+  const list = words || (fam.refresh ? fam.refresh() : pickSessionWords(fam));
+  if (!list.length) return go("#/");
+  const session = { fam, groupKey, words: list, index: 0, results: [], streak: 0, said: new Set() };
   learnStep(session);
 }
+
+// Each instruction is read aloud the first time it appears in a session.
+function sayInstructionOnce(session, text) {
+  if (session.said.has(text)) return;
+  session.said.add(text);
+  readInstruction(text, { force: true });
+}
+
+const backHref = (session) => session.fam.backHref || `#/family/${session.fam.id}`;
 
 function progressDots(session) {
   return `<div class="dots" aria-label="Word ${session.index + 1} of ${session.words.length}">${session.words
@@ -43,7 +59,7 @@ function progressDots(session) {
 
 const sessionHeader = (session) => h`
   <header class="top">
-    <a class="icon-btn" href="#/family/${session.fam.id}" aria-label="Stop practising">✖️</a>
+    <a class="icon-btn" href="${backHref(session)}" aria-label="Stop practising">✖️</a>
     ${progressDots(session)}
     ${seedBadge()}
   </header>`;
@@ -69,7 +85,7 @@ function learnStep(session) {
   app.innerHTML = h`
     ${sessionHeader(session)}
     ${session.index === 0 ? companionHtml("start") : ""}
-    <p class="step-label">Look and listen</p>
+    ${instructionHtml("Look and listen")}
     ${pic ? `<div class="picture-clue" aria-hidden="true">${pic}</div>` : ""}
     <div class="big-word" id="bigword" aria-label="${esc(word)}">${chunkedWordHtml(word)}</div>
     <p class="beats muted">${beatsLabel(chunks(word).length)}</p>
@@ -79,11 +95,12 @@ function learnStep(session) {
       <button class="btn" id="sos">🔤 Spell it with me</button>
       <button class="btn" id="rainbow">🌈 Rainbow write</button>
     </div>
-    ${trick ? `<div class="tip card"><span aria-hidden="true">🧠</span> ${esc(trick)}</div>` : ""}
+    ${trick ? `<div class="tip card speakable"><span aria-hidden="true">🧠</span> ${withSayButton(esc(trick))}</div>` : ""}
     <button class="btn primary big" id="ready">I'm ready! Hide the word</button>
     <div id="overlay"></div>`;
 
   stop();
+  sayInstructionOnce(session, "Look and listen.");
   say(word);
   on("#hear", "click", () => say(word));
   on("#sos", "click", async (e) => {
@@ -130,10 +147,13 @@ function attemptStep(session, attempt) {
   const useChunks = box === 0 && chunks(word).length > 1;
   const useTiles = !useChunks && box < 2;
   const pieces = useChunks ? chunks(word) : [...word];
+  const instruction = useChunks
+    ? "Put the chunks in order"
+    : useTiles ? "Tap the letters to build the word" : "Type the word";
   stop();
   app.innerHTML = h`
     ${sessionHeader(session)}
-    <p class="step-label">${useChunks ? "Put the chunks in order" : useTiles ? "Build the word" : "Write the word"}</p>
+    ${instructionHtml(instruction)}
     <div class="row">
       <button class="btn" id="hear">🔊 Hear it again</button>
       <button class="btn" id="peek">👀 Show me again</button>
@@ -143,6 +163,7 @@ function attemptStep(session, attempt) {
       autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word" />`}
     <button class="btn primary big" id="check" disabled>Check</button>`;
 
+  sayInstructionOnce(session, `${instruction}.`);
   say(word);
   const check = app.querySelector("#check");
   on("#hear", "click", () => say(word));
@@ -187,7 +208,9 @@ function feedbackStep(session, attempt, answer) {
     const left = MASTERED_BOX - box;
     const msg = box >= MASTERED_BOX
       ? "Your flower is fully grown! 🌻"
-      : result?.grew
+      : result?.watered
+        ? "Watered! 💧 This plant has already grown today, so it will grow again tomorrow."
+        : result?.grew
         ? `Your plant grew! ${left === 1 ? "Just 1 more right answer" : `${left} more right answers`} to make it a flower.`
         : `${left === 1 ? "1 more right answer" : `${left} more right answers`} to make it a flower.`;
     const headline = praise(attempt === 1 ? "correct" : "retry");
@@ -206,22 +229,31 @@ function feedbackStep(session, attempt, answer) {
         <button class="btn primary big" id="next">Next</button>
       </div>`;
     sound(result?.mastered ? "fanfare" : "correct");
-    cheer(`${spoken(headline)} ${app.querySelector(".bubble")?.textContent || ""}`);
+    cheer(`${spoken(headline)} ${app.querySelector(".bubble .say-text")?.textContent || ""}`);
     on("#next", "click", () => nextWord(session));
     return;
   }
 
-  const compare = [...word]
-    .map((c, i) => `<span class="letter ${answer[i]?.toLowerCase() === c.toLowerCase() ? "good" : "fix"}">${esc(c)}</span>`)
+  // Line the two spellings up so only the letters that differ are highlighted.
+  const steps = alignSpelling(answer, word);
+  const compare = steps
+    .filter((st) => st.kind !== "extra")
+    .map((st) => `<span class="letter ${st.kind === "same" ? "good" : st.kind === "missing" ? "fix missing" : "fix"}">${esc(st.word)}</span>`)
     .join("");
+  const yours = steps
+    .filter((st) => st.kind !== "missing")
+    .map((st) => st.kind === "same" ? esc(st.answer) : `<mark class="${st.kind === "extra" ? "extra" : "wrong"}">${esc(st.answer)}</mark>`)
+    .join("");
+  const difference = describeDifference(steps);
   const type = result?.mistakeTypes?.find((t) => t !== "other");
   const advice = type ? MISTAKE_TYPES[type].advice : null;
   app.innerHTML = h`
     <div class="feedback">
       ${companionHtml("mistake")}
-      <p class="muted">You wrote: <span class="yours">${esc(answer)}</span></p>
+      <p class="muted">You wrote: <span class="yours">${yours}</span></p>
       <div class="big-word">${compare}</div>
-      <p class="muted">The <span class="good-key">green</span> letters you got right. Look at the <span class="fix-key">orange</span> ones.</p>
+      ${difference ? `<p class="difference speakable">${withSayButton(esc(difference))}</p>` : ""}
+      <p class="muted small">The <span class="good-key">green</span> letters you got right. Look at the <span class="fix-key">orange</span> ones.</p>
       ${advice ? `<div class="tip card"><span aria-hidden="true">💡</span> ${esc(advice)}</div>` : ""}
       <div class="row">
         <button class="btn" id="hear">🔊 Hear it</button>
@@ -231,7 +263,7 @@ function feedbackStep(session, attempt, answer) {
       </div>
     </div>`;
   sound("oops");
-  warm(app.querySelector(".bubble")?.textContent || "");
+  warm(`${app.querySelector(".bubble .say-text")?.textContent || ""} ${difference}`);
   on("#hear", "click", () => { stop(); say(word); });
   on("#again", "click", () => learnStepRetry(session));
   on("#retry", "click", () => attemptStep(session, 2));
@@ -267,10 +299,10 @@ function endScreen(session) {
       <div class="row">
         <button class="btn primary big" id="again">Practise more</button>
         <a class="btn" href="#/garden">🏡 My garden</a>
-        <a class="btn" href="#/year/${session.groupKey}">Back</a>
+        <a class="btn" href="${session.fam.backHref || `#/year/${session.groupKey}`}">Back</a>
       </div>
     </div>`;
   sound("fanfare");
-  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : app.querySelector(".bubble")?.textContent || ""}`);
+  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : app.querySelector(".bubble .say-text")?.textContent || ""}`);
   on("#again", "click", () => startSession(session.fam, session.groupKey));
 }

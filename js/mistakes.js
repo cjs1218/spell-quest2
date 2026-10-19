@@ -22,7 +22,7 @@ export const MISTAKE_TYPES = {
   vowel: {
     label: "Vowel sounds",
     advice: "The consonants were right! Look closely at the a, e, i, o, u letters.",
-    familyMatch: (id) => /-(e|o|i|y|ear|ie|o-u|u-oo|o-oo|a-ar|e-ea|o-y)/.test(id),
+    familyMatch: (id) => /^y\d+-(e|o|i|ear-eigh|ie-ei|o-u|u-oo|o-oo|a-ar|e-ea|o-y)$/.test(id),
   },
   order: {
     label: "Letters in the wrong order",
@@ -32,7 +32,7 @@ export const MISTAKE_TYPES = {
   ending: {
     label: "Word endings",
     advice: "The start was right. Practise endings like -tion, -ous, -ence and -ally.",
-    familyMatch: (id) => /(tion|al-ar|ence|ous|ise|ould)/.test(id),
+    familyMatch: (id) => /-(tion|al-ar|ence|ous|ise|ould)$/.test(id),
   },
   start: {
     label: "First sounds",

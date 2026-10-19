@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS = {
   lively: true, // excited voice for praise
   sounds: true, // celebration sound effects
   voice: null, // chosen voice name, or null for the best available
+  readAloud: true, // read instructions aloud
 };
 
 export const AVATARS = ["🦊", "🐰", "🐻", "🐼", "🐸", "🐯", "🦄", "🐙", "🐝", "🐢", "🦉", "🐶"];
@@ -119,19 +120,22 @@ export function switchProfile(id) {
   loadProfile(id);
 }
 
-export function addProfile(name, avatar) {
+export const YEARS = { y1: "Year 1", y2: "Year 2", y34: "Year 3 or 4", y56: "Year 5 or 6" };
+
+export function addProfile(name, avatar, year = null) {
   const id = newId();
-  root.profiles.push({ id, name: name.trim().slice(0, 20) || "Gardener", avatar: avatar || "🦊" });
+  root.profiles.push({ id, name: name.trim().slice(0, 20) || "Gardener", avatar: avatar || "🦊", year });
   writeJson(profileKey(id), emptyProfileData());
   switchProfile(id);
   return id;
 }
 
-export function updateProfile(id, { name, avatar }) {
+export function updateProfile(id, { name, avatar, year }) {
   const p = root.profiles.find((x) => x.id === id);
   if (!p) return;
   if (name !== undefined) p.name = name.trim().slice(0, 20) || p.name;
   if (avatar) p.avatar = avatar;
+  if (year !== undefined) p.year = year || null;
   saveRoot();
 }
 
@@ -164,7 +168,9 @@ export function isDue(word, now = Date.now()) {
   return Boolean(s) && s.due <= now;
 }
 
-export const today = () => new Date().toISOString().slice(0, 10);
+// The child's local date, so "today" changes at their midnight, not UTC's.
+export const today = (d = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
 export function isoWeek(d = new Date()) {
   const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -190,30 +196,49 @@ export function recordAttempt(word, correct, answer = "") {
   let seedsEarned = 0;
   let mistakeTypes = [];
   s.seen += 1;
+  const day = today();
+  let watered = false;
 
-  if (correct) {
+  // Spaced practice: a word can only grow one step per day. Extra practice the
+  // same day still counts as "watering" (and earns a seed) but the plant waits
+  // until tomorrow to grow again. Likewise a slip only moves it back once a day.
+  if (correct && s.grewOn === day && s.box < MASTERED_BOX) {
+    watered = true;
+    seedsEarned += SEEDS.correct;
+  } else if (correct) {
     s.box = Math.min(s.box + 1, MASTERED_BOX);
+    if (s.box > before) s.grewOn = day;
     seedsEarned += SEEDS.correct;
     if (s.box === MASTERED_BOX && before < MASTERED_BOX) {
       seedsEarned += SEEDS.mastered;
       if (wasHard) data.comebacks += 1;
     }
   } else {
-    s.box = Math.max(s.box - 1, 0);
+    if (s.droppedOn !== day) {
+      s.box = Math.max(s.box - 1, 0);
+      s.droppedOn = day;
+    }
     s.misses += 1;
     mistakeTypes = classifyMistake(answer, word);
     for (const t of mistakeTypes) data.mistakes[t] = (data.mistakes[t] || 0) + 1;
     data.mistakeLog = [{ word, answer, types: mistakeTypes, at: Date.now() }, ...data.mistakeLog].slice(0, 60);
   }
 
-  const days = BOX_INTERVAL_DAYS[Math.min(s.box, BOX_INTERVAL_DAYS.length - 1)];
-  s.due = Date.now() + days * 86400000;
+  if (!watered) {
+    const days = BOX_INTERVAL_DAYS[Math.min(s.box, BOX_INTERVAL_DAYS.length - 1)];
+    s.due = startOfToday() + days * 86400000;
+  }
   data.words[word] = s;
   data.seeds += seedsEarned;
   markPractisedToday();
   save();
-  return { state: s, grew: s.box > before, mastered: s.box === MASTERED_BOX && before < MASTERED_BOX, seedsEarned, mistakeTypes };
+  return { state: s, grew: s.box > before, watered, mastered: s.box === MASTERED_BOX && before < MASTERED_BOX, seedsEarned, mistakeTypes };
 }
+
+const startOfToday = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
+
+/** True if this word has already grown today (so it's resting until tomorrow). */
+export const grewToday = (word) => wordState(word).grewOn === today() && wordState(word).box < MASTERED_BOX;
 
 export function summary(words) {
   let mastered = 0, growing = 0;
@@ -311,4 +336,47 @@ export const schoolList = () => data.school;
 export function setSchoolList(list) {
   data.school = list ? { ...list, setAt: Date.now() } : null;
   save();
+}
+
+// ---------- keeping progress safe ----------
+
+/** Ask the browser not to clear our saved progress when space is low. */
+export async function requestPersistence() {
+  try {
+    if (navigator.storage?.persisted && (await navigator.storage.persisted())) return true;
+    return (await navigator.storage?.persist?.()) || false;
+  } catch {
+    return false;
+  }
+}
+
+/** Everything on this device (all children) as one object to save as a file. */
+export function exportBackup() {
+  save();
+  const profilesData = {};
+  for (const p of root.profiles) profilesData[p.id] = readJson(profileKey(p.id));
+  return { app: "spell-quest", version: 2, savedAt: new Date().toISOString(), root, profiles: profilesData };
+}
+
+/** Restore a backup made by exportBackup(). Replaces what's on this device. */
+export function importBackup(backup) {
+  if (backup?.app !== "spell-quest" || !backup.root?.profiles?.length || !backup.profiles) {
+    throw new Error("This doesn't look like a Spell Quest backup.");
+  }
+  for (const p of root.profiles) {
+    try { localStorage.removeItem(profileKey(p.id)); } catch { /* ignore */ }
+  }
+  for (const p of backup.root.profiles) writeJson(profileKey(p.id), backup.profiles[p.id] || emptyProfileData());
+  root = backup.root;
+  if (!root.profiles.some((p) => p.id === root.current)) root.current = root.profiles[0].id;
+  saveRoot();
+  loadProfile(root.current);
+  try { localStorage.setItem("spellquest.lastBackup", new Date().toISOString()); } catch { /* ignore */ }
+}
+
+export function markBackedUp() {
+  try { localStorage.setItem("spellquest.lastBackup", new Date().toISOString()); } catch { /* ignore */ }
+}
+export function lastBackup() {
+  try { return localStorage.getItem("spellquest.lastBackup"); } catch { return null; }
 }

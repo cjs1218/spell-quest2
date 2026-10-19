@@ -19,5 +19,5 @@ export const companionLine = (kind, vars) => praise(KINDS[kind] || kind, vars);
 /** Hazel with a speech bubble. Pass a custom message or a kind of line. */
 export function companionHtml(kindOrText, { custom = false, vars } = {}) {
   const text = custom ? kindOrText : companionLine(kindOrText, vars);
-  return `<div class="companion" role="status"><span class="hedgehog" aria-hidden="true">🦔</span><p class="bubble">${esc(text)}</p></div>`;
+  return `<div class="companion" role="status"><span class="hedgehog" aria-hidden="true">🦔</span><p class="bubble speakable"><span class="say-text">${esc(text)}</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p></div>`;
 }

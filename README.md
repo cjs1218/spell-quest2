@@ -8,6 +8,12 @@ Every word a child learns grows into a flower in their spelling garden.
 
 ## What it does
 
+- **Today's words.** One big button picks what to practise: words that are due
+  again (from any year), then new words from the school list and the child's year.
+- **Spaced practice that means something.** A word grows one step a day at most.
+  Extra practice the same day counts as watering, so a flower really shows a word
+  remembered over several days.
+
 - **Spelling families, not random lists.** All 300+ words are grouped
   by pattern (silent letters, soft c, double letters, *-tion* endings and so on),
   each with a child-friendly tip.
@@ -21,8 +27,13 @@ Every word a child learns grows into a flower in their spelling garden.
   chunks, then from letter tiles, and once it's growing the child types it.
 - **Spaced repetition.** Words come back after 1, 2, 4 and 7 days. A mistake moves
   a word back one step, never to the start.
-- **Gentle mistakes.** Feedback shows which letters were right (green) and which
-  to look at (orange). There's always a second try.
+- **Gentle, precise mistakes.** The child's spelling is lined up with the real
+  word, so only the letters that differ are highlighted (*becuse* → just the
+  missing **a**), and Hazel says what to fix: "So close! It needs an a."
+  There's always a second try.
+- **Instructions read aloud** the first time they appear, and every 🔊 button
+  reads out Hazel's words, tips and instructions, for children who can't read
+  them yet.
 - **"Show me again"** at any point: peek at the word again with no penalty.
 - **Memory tricks** for the trickiest words (*"There's a rat in separate"*), and
   **picture clues** for words that can be drawn.
@@ -66,6 +77,21 @@ Every word a child learns grows into a flower in their spelling garden.
   list: each word chopped into syllables, a line to trace, space to write it twice,
   and memory tricks.
 - **Calm mode** for fewer animations.
+- **Grown-ups lock:** a quick sum before the grown-ups pages, so children don't
+  reset progress or change the school list by accident.
+- **Each child's school year** decides which new words appear in Today's words.
+
+## Keeping progress safe
+
+Safari on iPad and iPhone can clear a website's saved data if it isn't opened for
+about a week. To protect each child's garden:
+
+- **Install it:** Spell Quest is an installable web app with offline support.
+  On iPad/iPhone use Share → *Add to Home Screen*; on Android, Chrome or Edge use
+  *Install app*. Installed apps aren't cleared, and it works without internet.
+- **Backups:** the grown-ups page saves a backup file of every child's progress
+  and can restore it, including onto a new device.
+- The app also asks the browser to keep its data (persistent storage).
 
 ## Dyslexia-friendly design
 
@@ -128,6 +154,13 @@ js/words.js            word lists grouped into families, plus memory tricks
 js/syllables.js        syllable splits, plus automatic splitting for new words
 js/pictures.js         picture clues
 js/builder.js          word-building challenges
+js/today.js            chooses Today's words
+js/align.js            lines up a misspelling with the real word for feedback
+js/readaloud.js        reads instructions aloud, 🔊 buttons
+js/gate.js             grown-ups lock
+js/backup.js           install guidance, backup and restore
+sw.js                  offline support (service worker)
+manifest.webmanifest   app name and icons for installing
 js/speech.js           British English text-to-speech (teaching, cheerful and gentle styles)
 js/sounds.js           celebration sound effects
 tools/check-words.mjs  checks every word appears once and has syllables
@@ -141,12 +174,14 @@ node tools/check-words.mjs
 
 ## Ideas for next steps
 
+- [ ] Test all the words in a session at the end, not straight after each one
+- [ ] "Write it on paper, then check" mode, closer to school spelling tests
+- [ ] Letter tiles that keep letter teams together (*igh*, *tion*)
+- [ ] Self-host the fonts instead of loading them from Google
 - [ ] Child records their own memory trick or draws a picture clue
 - [ ] Finger-tracing mode on touchscreens
 - [ ] More games: Homophone Hunt, Spot the Spelling Monster, a rhyming game
 - [ ] Dictation sentences
-- [ ] Back up and restore a child's garden with a code
 - [ ] Story mode that uses the week's words, read aloud with highlighting
 - [ ] OpenDyslexic font option
-- [ ] Works offline (installable web app)
 - [ ] Test with dyslexic children, parents and SENCos

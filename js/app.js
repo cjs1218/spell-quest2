@@ -10,18 +10,32 @@ import {
 } from "./screens.js";
 import { gardenScreen } from "./garden.js";
 import { gameScreen } from "./games.js";
+import { todayScreen } from "./screens.js";
+import { isUnlocked, gateScreen } from "./gate.js";
+import { protectStorage } from "./backup.js";
+import "./readaloud.js";
+
+const GROWN_UP_SCREENS = new Set(["grown-ups", "school", "print"]);
 
 function route() {
   const [, screen, a, b] = (location.hash || "#/").split("/");
 
   // With more than one child on the device, ask who's practising first.
   const picked = (() => { try { return sessionStorage.getItem("spellquest.picked"); } catch { return "1"; } })();
-  if (profiles().length > 1 && !picked && screen !== "profiles" && screen !== "grown-ups") {
+  if (profiles().length > 1 && !picked && screen !== "profiles" && !GROWN_UP_SCREENS.has(screen)) {
     location.hash = "#/profiles";
     return;
   }
 
-  if (screen === "year") yearScreen(a);
+  // Grown-up pages ask a quick question first (stays unlocked for 10 minutes).
+  if (GROWN_UP_SCREENS.has(screen) && !isUnlocked()) {
+    gateScreen(route);
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  if (screen === "today") todayScreen();
+  else if (screen === "year") yearScreen(a);
   else if (screen === "family") familyScreen(a);
   else if (screen === "game") gameScreen(a, b);
   else if (screen === "garden") gardenScreen();
@@ -47,5 +61,11 @@ document.addEventListener("click", (e) => {
 
 applySettings();
 schoolGroup();
+protectStorage();
+
+// Offline support and "install as an app" (needs https or localhost).
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
 window.addEventListener("hashchange", () => { stop(); route(); });
 route();

@@ -19,7 +19,7 @@ plant plant | path path | bath bath | move move | prove prove | improve im-prove
 could could | should should | would would | sure sure | sugar su-gar | because be-cause
 pretty pret-ty | beautiful beau-ti-ful | eye eye | hour hour | any an-y | many man-y
 whole whole | clothes clothes | busy bus-y | people peo-ple | water wa-ter | again a-gain
-half half | money mon-ey | parent par-ent | Christmas Christ-mas | Mr Mr | Mrs Mrs
+half half | money mon-ey | parents par-ents | Christmas Christ-mas | Mr Mr | Mrs Mrs
 
 accident ac-ci-dent | accidentally ac-ci-den-tal-ly | actual ac-tu-al | actually ac-tu-al-ly
 address ad-dress | answer an-swer | appear ap-pear | arrive ar-rive | believe be-lieve
