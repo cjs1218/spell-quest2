@@ -125,11 +125,11 @@ function sortGame(ctx) {
   let firstTry = true;
 
   frame(ctx, h`
-    ${instructionHtml("Tap a word, then tap the basket it belongs in.")}
+    ${instructionHtml("Tap a word, then tap the basket where it belongs.")}
     <div class="chips" id="chips">${words.map((x, i) => `<button class="chip" data-i="${i}">${esc(x.w)}</button>`).join("")}</div>
     <div class="baskets">${fams.map((f, fi) => `<button class="basket" data-fi="${fi}"><strong>🧺 ${esc(f.name)}</strong><span class="basket-words"></span></button>`).join("")}</div>
     <div id="msg"></div>`, "nodots");
-  readInstruction("Tap a word, then tap the basket it belongs in.");
+  readInstruction("Tap a word, then tap the basket where it belongs.");
 
   on(".chip", "click", (e) => {
     selected = e.currentTarget;
@@ -173,7 +173,7 @@ function oddGame(ctx) {
   frame(ctx, h`
     <div class="odd-grid">${options.map((w) => `<button class="odd-card" data-w="${esc(w)}">${esc(w)}</button>`).join("")}</div>
     <div id="msg"></div>
-    <button class="btn primary big" id="next" hidden>Next</button>`, "Which word doesn't belong?");
+    <button class="btn primary big" id="next" hidden>Next</button>`, "Three words match. Tap the odd one out!");
 
   let tries = 0;
   on(".odd-card", "click", (e) => {
@@ -218,7 +218,7 @@ function buildGame(ctx) {
     </div>
     <div class="tiles">${choices.map((c) => `<button class="tile chunk-tile" data-p="${esc(c)}">${esc(c)}</button>`).join("")}</div>
     <div id="msg"></div>
-    <div id="step2"></div>`, "Pick the missing piece");
+    <div id="step2"></div>`, "Tap the piece that makes the word");
 
   say(b.word);
   on("#hear", "click", () => say(b.word));
@@ -251,10 +251,10 @@ function buildGame(ctx) {
       : `${esc(b.prefix ? b.add.join(" + ") + " + " + b.base : [b.base, ...b.add].join(" + "))} = ${esc(b.word)}. ${esc(b.rule || "")}`);
     const step = app.querySelector("#step2");
     step.innerHTML = h`
-      ${instructionHtml("Now build the whole word")}
+      ${instructionHtml("Now tap the letters to spell the whole word")}
       ${tilesHtml(b.word, [...b.word])}
       <button class="btn primary big" id="check" disabled>Check</button>`;
-    readInstruction("Now build the whole word.");
+    readInstruction("Now tap the letters to spell the whole word.");
     const check = step.querySelector("#check");
     const get = setupTiles(step, b.word.length, { onChange: (full) => (check.disabled = !full) });
     check.addEventListener("click", () => {
@@ -289,7 +289,7 @@ function pictureGame(ctx) {
     <div id="hintbox" aria-live="polite"></div>
     ${tilesHtml(word, pieces)}
     <div id="msg"></div>
-    <button class="btn primary big" id="check" disabled>Check</button>`, "Spell the picture");
+    <button class="btn primary big" id="check" disabled>Check</button>`, "What is in the picture? Spell it!");
 
   say(word);
   let tries = 0;
@@ -334,7 +334,7 @@ function drumGame(ctx) {
       <button class="btn subtle" id="reset">Start again</button>
       <button class="btn primary" id="done">Done</button>
     </div>
-    <div id="msg"></div>`, "Say the word and tap the drum once for each beat");
+    <div id="msg"></div>`, "Say the word slowly. Tap the drum once for each beat.");
 
   say(word);
   let tries = 0;

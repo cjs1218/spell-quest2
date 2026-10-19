@@ -86,7 +86,7 @@ function learnStep(session) {
   app.innerHTML = h`
     ${sessionHeader(session)}
     ${session.index === 0 ? companionHtml("start") : ""}
-    ${instructionHtml("Look and listen")}
+    ${instructionHtml("Look at the word and listen")}
     ${pic ? `<div class="picture-clue" aria-hidden="true">${pic}</div>` : ""}
     <div class="big-word" id="bigword" aria-label="${esc(word)}">${trick ? trickWordHtml(word) : chunkedWordHtml(word)}</div>
     <p class="beats muted">${beatsLabel(chunks(word).length)}</p>
@@ -101,7 +101,7 @@ function learnStep(session) {
     <div id="overlay"></div>`;
 
   stop();
-  sayInstructionOnce(session, "Look and listen.");
+  sayInstructionOnce(session, "Look at the word and listen. When you know it, tap I'm ready.");
   say(word);
   on("#hear", "click", () => say(word));
   on("#sos", "click", async (e) => {
@@ -149,8 +149,8 @@ function attemptStep(session, attempt) {
   const useTiles = !useChunks && box < 2;
   const pieces = useChunks ? chunks(word) : [...word];
   const instruction = useChunks
-    ? "Put the chunks in order"
-    : useTiles ? "Tap the letters to build the word" : "Type the word";
+    ? "Tap the chunks in the right order"
+    : useTiles ? "Tap the letters in the right order" : "Type the word you hear";
   stop();
   app.innerHTML = h`
     ${sessionHeader(session)}

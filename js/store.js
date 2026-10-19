@@ -317,6 +317,14 @@ export function setMission(m) {
   save();
 }
 
+export const helpSeen = () => Boolean(data.helpSeen);
+export function markHelpSeen() {
+  if (!data.helpSeen) {
+    data.helpSeen = true;
+    save();
+  }
+}
+
 export const lastGroup = () => data.lastGroup;
 export function setLastGroup(key) {
   if (data.lastGroup !== key) {

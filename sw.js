@@ -3,7 +3,7 @@
 // refreshed in the background so updates arrive on the next visit.
 // Bump VERSION when files are added or removed.
 
-const VERSION = "spellquest-v5";
+const VERSION = "spellquest-v6";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -16,7 +16,7 @@ const APP_FILES = [
     "app", "builder", "companion", "games", "garden", "groups", "mission", "mistakes",
     "pictures", "practice", "praise", "rainbow", "screens", "sounds", "speech", "store",
     "syllables", "ui", "words", "align", "today", "gate", "backup", "readaloud",
-    "mnemonics", "trickview",
+    "mnemonics", "trickview", "help",
   ].map((f) => `./js/${f}.js`),
 ];
 

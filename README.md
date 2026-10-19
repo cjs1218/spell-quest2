@@ -6,6 +6,23 @@ exception words and the statutory spelling lists for Years 3–4 and 5–6.
 
 Every word a child learns grows into a flower in their spelling garden.
 
+## Quick start for grown-ups
+
+1. **Open it and install it:** on iPad/iPhone, open the app in Safari, tap
+   **Share → Add to Home Screen**, and open it from the 🌻 icon from then on.
+   On Android or a computer, choose **Install app** from the browser menu.
+2. **Add your child** (tap the animal picture at the top) with their **school year**.
+3. **Let them choose** a background colour and font in ⚙️ Settings.
+4. **About 10 minutes a day:** tap **Today's words**, and stop when it says
+   *All watered for today*.
+5. **Grown-ups page** (🔒): add the school's weekly list, see progress and
+   mistake patterns, print practice sheets, and **save a backup** now and then.
+
+The app has two built-in guides: **❓ How to play** for children (shown on a
+child's first visit, and read aloud) and **📖 Grown-ups' guide**, which covers
+setting up, a daily routine, how the app teaches, how to help at home, progress,
+school lists, keeping progress safe, and questions and fixes. It can be printed.
+
 ## What it does
 
 - **Today's words.** One big button picks what to practise: words that are due
@@ -155,6 +172,7 @@ js/rainbow.js          rainbow writing canvas
 js/store.js            profiles, progress, spaced repetition, seeds, missions (localStorage)
 js/mission.js          weekly missions
 js/mistakes.js         sorts mistakes into patterns
+js/help.js             How to play (children) and the grown-ups' guide
 js/companion.js        Hazel the hedgehog
 js/praise.js           all praise and encouragement lines
 js/groups.js           year groups plus the school list

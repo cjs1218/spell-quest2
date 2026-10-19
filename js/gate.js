@@ -33,7 +33,8 @@ export function gateScreen(onPass) {
       </label>
       <button class="btn primary" id="gate-go">Continue</button>
     </div>
-    <p class="muted small center">Children: ask a grown-up to help with this page. 🦔</p>`;
+    <p class="muted small center">Children: ask a grown-up to help with this page. 🦔</p>
+    <p class="center"><a class="small-link" href="#/guide">📖 Read the grown-ups' guide (no question needed)</a></p>`;
   const input = app.querySelector("#gate-answer");
   const check = () => {
     if (Number(input.value.trim()) === a * b) {

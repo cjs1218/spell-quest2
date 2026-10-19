@@ -1,6 +1,7 @@
 // Spell Quest: router. Screens live in screens.js, practice.js, games.js and garden.js.
 
-import { profiles } from "./store.js";
+import { profiles, helpSeen } from "./store.js";
+import { kidsHelpScreen, grownUpsGuideScreen } from "./help.js";
 import { stop } from "./speech.js";
 import { schoolGroup } from "./groups.js";
 import { applySettings } from "./ui.js";
@@ -34,7 +35,15 @@ function route() {
     return;
   }
 
-  if (screen === "today") todayScreen();
+  // A child's very first visit starts with "How to play".
+  if (!screen && !helpSeen()) {
+    location.hash = "#/help";
+    return;
+  }
+
+  if (screen === "help") kidsHelpScreen();
+  else if (screen === "guide") grownUpsGuideScreen();
+  else if (screen === "today") todayScreen();
   else if (screen === "year") yearScreen(a);
   else if (screen === "family") familyScreen(a);
   else if (screen === "word") wordScreen(a, b);

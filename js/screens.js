@@ -131,7 +131,11 @@ export function homeScreen() {
       ${daysPractised() ? `<span class="badge">🗓️ Practised on ${daysPractised()} day${daysPractised() === 1 ? "" : "s"}</span>` : ""}
       ${comebacks() ? `<span class="badge">💪 ${comebacks()} comeback word${comebacks() === 1 ? "" : "s"}</span>` : ""}
     </section>
-    <a class="small-link" href="#/grown-ups">🔒 For grown-ups</a>`;
+    <div class="home-links">
+      <a class="small-link" href="#/help">❓ How to play</a>
+      <a class="small-link" href="#/guide">📖 Grown-ups' guide</a>
+      <a class="small-link" href="#/grown-ups">🔒 For grown-ups</a>
+    </div>`;
 
   on("#dismiss-safety", "click", () => { dismissSafetyReminder(); homeScreen(); });
 }
@@ -440,7 +444,7 @@ export function grownUpsScreen() {
 
   app.innerHTML = h`
     ${header("#/", "For grown-ups", `<button class="icon-btn" id="lock" aria-label="Lock grown-ups area">🔒</button>`)}
-    <p class="muted">Showing <strong>${me.avatar} ${esc(me.name)}</strong>. <a href="#/profiles">Switch child</a></p>
+    <p class="muted">Showing <strong>${me.avatar} ${esc(me.name)}</strong>. <a href="#/profiles">Switch child</a> · <a href="#/guide">📖 Grown-ups' guide</a></p>
 
     ${keepSafeHtml()}
 

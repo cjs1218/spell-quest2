@@ -592,3 +592,34 @@ select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem
 .trick-card .trick-picture { text-align: center; font-size: 2.8rem; min-width: 0; }
 .trick-card.compact .trick-picture { font-size: 2.2rem; }
 .is-acrostic .trick-text { margin-top: -2.2rem; }
+
+/* ---------- Instructions ---------- */
+.home-links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-top: 0.5rem; }
+.home-links .small-link { margin-top: 0; }
+
+.kid-steps { list-style: none; padding: 0; margin: 0.75rem 0 1rem; counter-reset: step; }
+.kid-step {
+  display: grid; grid-template-columns: 3.2rem 1fr auto; gap: 0.7rem; align-items: center;
+  padding: 0.8rem 0.9rem; margin-bottom: 0.6rem; border-radius: 1rem; background: var(--card); border: 2px solid var(--line);
+}
+.kid-step.reading { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.kid-icon { font-size: 2.2rem; text-align: center; }
+.kid-step strong { display: block; font-size: 1.1rem; }
+.kid-step .say-btn { margin-left: 0; }
+
+.guide h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.guide ol, .guide ul { padding-left: 1.3rem; }
+.guide li { margin-bottom: 0.45rem; }
+.guide em { font-style: normal; font-weight: 600; }
+.guide-contents ol { margin: 0.4rem 0 0; }
+.guide-contents a { color: var(--accent); }
+.faq dt { font-weight: 700; margin-top: 0.7rem; }
+.faq dd { margin: 0.2rem 0 0; }
+
+@media print {
+  .guide .card { border: 1px solid #999; break-inside: avoid; }
+  .guide a { color: #000; text-decoration: none; }
+}
+.print-only { display: none; }
+@media print { .print-only { display: block; } }
+.kid-step strong { font-size: 1.15rem; }
