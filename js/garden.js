@@ -4,7 +4,7 @@
 import { getGroups, allWords } from "./groups.js";
 import { wordState, MASTERED_BOX, seeds, spendSeeds, owned, ownItem, garden, setGarden } from "./store.js";
 import { companionHtml } from "./companion.js";
-import { app, h, on, header, PLANTS, toast } from "./ui.js";
+import { app, h, on, header, PLANTS, toast, keepScroll } from "./ui.js";
 import { say } from "./speech.js";
 
 export const FLOWERS = [
@@ -100,6 +100,6 @@ export function gardenScreen() {
       const d = garden().decor;
       setGarden({ decor: d.includes(item) && has ? d.filter((x) => x !== item) : [...new Set([...d, item])] });
     }
-    gardenScreen();
+    keepScroll(gardenScreen);
   });
 }

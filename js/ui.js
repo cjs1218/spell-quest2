@@ -115,3 +115,41 @@ export function toast(text) {
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 2200);
 }
+
+// ---------- always start a new screen at the top ----------
+// Screens are drawn by replacing everything inside #app. If the page was
+// scrolled down (game tiles and "Next" buttons are near the bottom), the new
+// screen would otherwise appear above the visible area and look blank.
+// On iPad, a scroll that's still gliding can undo a single jump to the top,
+// so we jump again on the next two frames.
+
+let keepNext = false;
+
+/** Re-draw the current screen without jumping to the top (e.g. after a shop purchase). */
+export function keepScroll(draw) {
+  const y = window.scrollY;
+  keepNext = true;
+  draw();
+  window.scrollTo(0, y);
+}
+
+function toTop() {
+  const el = document.scrollingElement || document.documentElement;
+  el.scrollTop = 0;
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
+
+if (app && "MutationObserver" in window) {
+  const root = document.documentElement;
+  new MutationObserver(() => {
+    if (keepNext) { keepNext = false; return; }
+    // Freezing scrolling for a frame stops an iPad "glide" in its tracks.
+    root.style.overflow = "hidden";
+    toTop();
+    requestAnimationFrame(() => {
+      toTop();
+      root.style.overflow = "";
+      requestAnimationFrame(toTop);
+    });
+  }).observe(app, { childList: true });
+}
