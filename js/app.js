@@ -34,6 +34,17 @@ function route() {
   window.scrollTo(0, 0);
 }
 
+// Tapping a link to the page you're already on (e.g. ✖️ during practice, which
+// happens "inside" the family page) wouldn't change the address, so re-route.
+document.addEventListener("click", (e) => {
+  const a = e.target.closest?.('a[href^="#"]');
+  if (a && a.getAttribute("href") === (location.hash || "#/")) {
+    e.preventDefault();
+    stop();
+    route();
+  }
+});
+
 applySettings();
 schoolGroup();
 window.addEventListener("hashchange", () => { stop(); route(); });

@@ -467,3 +467,16 @@ details summary { cursor: pointer; }
 .top h1 { overflow-wrap: anywhere; }
 .answer-slots .slot { font-size: min(1.7rem, calc((100vw - 2.5rem) / var(--n, 8) * 0.7)); }
 .chunk-slots .slot { width: auto; }
+
+/* Rainbow writing stars */
+.stars { display: flex; justify-content: center; gap: 0.6rem; font-size: 2.4rem; line-height: 1; margin: 0.25rem 0 0.6rem; }
+.star { color: var(--muted); transition: transform 0.3s; }
+.star.on { animation: star-pop 0.5s ease-out; }
+.stars.all-done .star { animation: star-pop 0.6s ease-out; }
+@keyframes star-pop { 0% { transform: scale(0.3); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+.canvas-wrap { position: relative; }
+.go-pop { position: absolute; inset: 0; display: grid; place-items: center; font-size: 4rem; pointer-events: none; opacity: 0; }
+.go-pop.show { animation: go-pop 0.9s ease-out; }
+@keyframes go-pop { 0% { opacity: 0; transform: scale(0.4); } 30% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(1) translateY(-30px); } }
+.go-meter { height: 0.5rem; border-radius: 1rem; background: var(--line); overflow: hidden; margin: 0.5rem 0 0; }
+.go-meter span { display: block; height: 100%; width: 0; border-radius: 1rem; transition: width 0.1s; }
