@@ -62,6 +62,7 @@ export function setupRainbow(root, word, onDone) {
   let goes = 0;
   let colourIndex = 0;
   let drawing = false;
+  let wiping = false; // true while the last go fades away
   let last = null;
   // Points sampled from the word's letter shapes, and which ones this go has covered.
   let samples = []; // { x, y, letter }
@@ -71,7 +72,9 @@ export function setupRainbow(root, word, onDone) {
 
   const colour = () => RAINBOW[colourIndex];
 
-  function drawGuide() {
+  // Draws the dotted word. `rebuild` re-measures the letters (first time / resize);
+  // a plain wipe between goes just clears the ink.
+  function drawGuide(rebuild = true) {
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.clientWidth;
     const hgt = canvas.clientHeight;
@@ -89,7 +92,7 @@ export function setupRainbow(root, word, onDone) {
       ctx.font = `600 ${size}px ${font}`;
       measured = max;
     }
-    buildSamples(w, hgt, ctx.font, measured);
+    if (rebuild) buildSamples(w, hgt, ctx.font, measured);
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.lineWidth = 2;
@@ -210,10 +213,26 @@ export function setupRainbow(root, word, onDone) {
     lastCheer = goes >= NEEDED ? praise("rainbow") : praise("star");
     sound(goes >= NEEDED ? "fanfare" : "star");
     cheer(spoken(goes >= NEEDED ? lastCheer.split("!")[0] + "!" : `${lastCheer} ${goes === 1 ? "That's one!" : "That's two!"}`));
-    // Move on to the next rainbow colour automatically.
-    if (goes < NEEDED) chooseColour((colourIndex + 1) % RAINBOW.length);
+    // Move on to the next rainbow colour automatically, and wipe the word clean
+    // so the next go is written on a fresh copy. The last go stays to admire.
+    if (goes < NEEDED) {
+      chooseColour((colourIndex + 1) % RAINBOW.length);
+      wipe();
+    }
     updateMeter();
     updateText();
+  }
+
+  function wipe() {
+    wiping = true;
+    setTimeout(() => {
+      canvas.classList.add("wipe");
+      setTimeout(() => {
+        drawGuide(false);
+        canvas.classList.remove("wipe");
+        wiping = false;
+      }, 350);
+    }, 500);
   }
 
   const point = (e) => {
@@ -222,6 +241,7 @@ export function setupRainbow(root, word, onDone) {
   };
 
   canvas.addEventListener("pointerdown", (e) => {
+    if (wiping) return;
     drawing = true;
     canvas.setPointerCapture(e.pointerId);
     ctx.strokeStyle = colour().hex;
