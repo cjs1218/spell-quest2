@@ -35,11 +35,13 @@ Every word a child learns grows into a flower in their spelling garden.
   reads out Hazel's words, tips and instructions, for children who can't read
   them yet.
 - **"Show me again"** at any point: peek at the word again with no penalty.
-- **Memory tricks with pictures** for 61 words (in `js/mnemonics.js`): the tricks
-  widely used in UK schools (*"There's a rat in separate"*, *"Big Elephants Can
-  Always Understand Small Elephants"*, *"O U Lucky Duck"*), plus clearly marked
-  suggestions for other tricky words. The trick's letters light up in the word,
-  and acrostics show each first letter.
+- **Memory tricks with pictures** for 71 words (in `js/mnemonics.js`): 38
+  well-known tricks from school spelling resources (*"There's a rat in
+  separate"*, *"Big Elephants Can Always Understand Small Elephants"*, *"O U
+  Lucky Duck"*) and 33 clearly marked "Hazel's ideas". Each one points at the part
+  children usually get wrong, and those letters light up in the word.
+- **Say it the silly way** for 30 words: the word said exactly as it's spelt
+  (*Feb-roo-ar-y*, *sto-match*, *ve-hick-le*), read out chunk by chunk.
 - **Word pages:** tap any word to see it up close with its picture, syllables,
   memory trick (or a prompt to make your own) and a "Practise this word" button.
 - **Picture clues** for words that can be drawn.

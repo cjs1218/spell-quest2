@@ -43,7 +43,9 @@ for (const [word, t] of Object.entries(TRICKS)) {
     if (!w.includes(part)) problem = `doesn't contain "${part}"`;
     else if (initials !== part) problem = `first letters spell "${initials}", not "${part}"`;
   }
+  if (!problem && !["known", "hazel"].includes(t.source)) problem = "source must be known or hazel";
+  if (!problem && t.say && t.say.replace(/-/g, "").toLowerCase().length < 2) problem = "say-it line is empty";
   if (problem) { ok = false; console.log(`  trick for ${word}: ${problem}`); }
 }
-console.log(`tricks: ${Object.keys(TRICKS).length} (${Object.values(TRICKS).filter((t) => t.source === "common").length} common, ${Object.values(TRICKS).filter((t) => t.source === "suggested").length} suggested)`);
+console.log(`tricks: ${Object.keys(TRICKS).length} (${Object.values(TRICKS).filter((t) => t.source === "known").length} well-known, ${Object.values(TRICKS).filter((t) => t.source === "hazel").length} Hazel's ideas, ${Object.values(TRICKS).filter((t) => t.say).length} say-it-the-silly-way)`);
 process.exitCode = ok ? 0 : 1;

@@ -37,6 +37,13 @@ document.addEventListener("click", (e) => {
   if (!btn) return;
   e.preventDefault();
   e.stopPropagation();
+  // "Say it the silly way": speak each chunk slowly, e.g. Feb … roo … ar … y
+  const silly = btn.closest("[data-silly]")?.dataset.silly;
+  if (silly) {
+    stop();
+    (async () => { for (const part of silly.split("-")) await say(part, { rate: 0.7 }); })();
+    return;
+  }
   const box = btn.closest(".speakable");
   const text = (box?.querySelector(".say-text") || box)?.textContent?.replace("🔊", "").trim();
   if (!text) return;

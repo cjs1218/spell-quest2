@@ -1,83 +1,98 @@
 // Memory tricks (mnemonics) for tricky words.
 //
-// source: "common"    – a trick widely used in UK primary schools (found in
-//                       school and local-authority spelling guides)
-//         "suggested" – our own idea for a word with no well-known trick
+// source: "known" – a well-known trick found in published school spelling
+//                   resources (UK school and local-authority guides, plus a
+//                   few widely shared ones)
+//         "hazel" – our own idea, for a word with no well-known trick
 //
-// kind:   "acrostic"  – each word's first letter spells the word (or `part` of it)
-//         "hidden"    – a smaller word hides inside (`hide`)
-//         "letters"   – highlight particular letters (`marks`, every occurrence)
+// kind:   "acrostic" – each word's first letter spells the word (or `part` of it)
+//         "hidden"   – a smaller word hides inside (`hide`)
+//         "letters"  – highlight particular letters (`marks`, every occurrence)
+// say:    optional "say it the silly way" spelling voice (e.g. Feb-roo-ar-y):
+//         saying a word exactly as it's spelt, a technique used in UK schools.
 // picture: a little emoji scene to go with the trick.
+//
+// Each trick should point at the part children usually get wrong.
 
 export const TRICKS = {
   // ----- Year 1 -----
-  said: { kind: "acrostic", text: "Snakes And Insects Dance", picture: "🐍🐜💃", source: "common" },
-  come: { kind: "acrostic", text: "Can't Open My Eyes", picture: "😴", source: "common" },
-  friend: { kind: "acrostic", text: "Fred Rushed In Eating Nine Doughnuts", picture: "🏃‍♂️🍩", source: "common" },
-  here: { kind: "hidden", hide: "here", text: "Here, there and where all have 'here' in them – they're all about places.", picture: "📍", source: "common" },
-  there: { kind: "hidden", hide: "here", text: "There's 'here' in there! Here, there and where are all about places.", picture: "📍", source: "common" },
-  where: { kind: "hidden", hide: "here", text: "Where has 'here' in it – here, there and where are all about places.", picture: "🗺️", source: "common" },
-  they: { kind: "hidden", hide: "the", text: "They starts with 'the'.", picture: "👫", source: "suggested" },
-  your: { kind: "hidden", hide: "you", text: "Your starts with 'you' – it's yours!", picture: "🫵", source: "suggested" },
+  said: { kind: "acrostic", text: "Snakes And Insects Dance", picture: "🐍🐜💃", source: "known" },
+  come: { kind: "acrostic", text: "Can't Open My Eyes", picture: "😴", source: "known" },
+  friend: { kind: "letters", marks: ["fri"], text: "My friend likes fries – we'll be friends to the end!", picture: "🍟🤝", source: "known" },
+  here: { kind: "hidden", hide: "here", text: "Here, there and where all have 'here' in them – they're all about places.", picture: "📍", source: "known" },
+  there: { kind: "hidden", hide: "here", text: "There's 'here' in there! Here, there and where are all about places.", picture: "📍", source: "known" },
+  where: { kind: "hidden", hide: "here", text: "Where has 'here' in it – here, there and where are all about places.", picture: "🗺️", source: "known" },
+  they: { kind: "hidden", hide: "the", text: "They starts with 'the'.", picture: "👫", source: "hazel" },
+  your: { kind: "hidden", hide: "you", text: "Your starts with 'you' – it's yours!", picture: "🫵", source: "hazel" },
 
   // ----- Year 2 -----
-  because: { kind: "acrostic", text: "Big Elephants Can Always Understand Small Elephants", picture: "🐘🐘", source: "common" },
-  people: { kind: "acrostic", text: "People Eat Orange Peel Like Elephants", picture: "🍊🐘", source: "common" },
-  could: { kind: "acrostic", part: "ould", text: "O U Lucky Duck!", picture: "🦆🍀", source: "common" },
-  should: { kind: "acrostic", part: "ould", text: "O U Lucky Duck!", picture: "🦆🍀", source: "common" },
-  would: { kind: "acrostic", part: "ould", text: "O U Lucky Duck!", picture: "🦆🍀", source: "common" },
-  beautiful: { kind: "acrostic", part: "beau", text: "Big Elephants Are Usually beautiful", picture: "🐘🌸", source: "suggested" },
-  eye: { kind: "letters", marks: ["e"], text: "Two e's are two eyes, with a nose (y) in the middle!", picture: "👀", source: "suggested" },
-  whole: { kind: "hidden", hide: "hole", text: "A whole doughnut has a hole in it!", picture: "🍩", source: "suggested" },
-  busy: { kind: "hidden", hide: "bus", text: "I'm busy on the bus!", picture: "🚌", source: "suggested" },
-  many: { kind: "hidden", hide: "any", text: "Many has 'any' inside it.", picture: "🔢", source: "suggested" },
-  money: { kind: "hidden", hide: "one", text: "There's 'one' in money – one coin!", picture: "🪙", source: "suggested" },
-  clothes: { kind: "hidden", hide: "cloth", text: "Clothes are made of cloth.", picture: "👕🧵", source: "suggested" },
-  hour: { kind: "letters", marks: ["h"], text: "The h is silent, so hour sounds just like 'our'. Our hour!", picture: "⏰", source: "suggested" },
+  because: { kind: "acrostic", text: "Big Elephants Can Always Understand Small Elephants", picture: "🐘🐘", source: "known" },
+  people: { kind: "acrostic", text: "People Eat Orange Peel Like Elephants", picture: "🍊🐘", source: "known" },
+  could: { kind: "acrostic", part: "ould", text: "O U Lucky Duck!", picture: "🦆🍀", source: "known" },
+  should: { kind: "acrostic", part: "ould", text: "O U Lucky Duck!", picture: "🦆🍀", source: "known" },
+  would: { kind: "acrostic", part: "ould", text: "O U Lucky Duck!", picture: "🦆🍀", source: "known" },
+  beautiful: { kind: "acrostic", part: "beau", text: "Big Elephants Aren't Ugly – they're beautiful!", picture: "🐘🌸", source: "known" },
+  eye: { kind: "letters", marks: ["e"], text: "Two e's are two eyes, with a nose (y) in the middle!", picture: "👀", source: "hazel" },
+  whole: { kind: "hidden", hide: "hole", text: "A whole doughnut has a hole in it!", picture: "🍩", source: "hazel" },
+  busy: { kind: "hidden", hide: "bus", text: "I'm busy on the bus!", picture: "🚌", source: "hazel" },
+  many: { kind: "hidden", hide: "any", text: "Many has 'any' inside it.", picture: "🔢", source: "hazel" },
+  money: { kind: "hidden", hide: "one", text: "There's 'one' in money – one coin!", picture: "🪙", source: "hazel" },
+  clothes: { kind: "hidden", hide: "cloth", text: "Clothes are made of cloth.", picture: "👕🧵", source: "hazel" },
+  hour: { kind: "letters", marks: ["h"], text: "The h is silent, so hour sounds just like 'our'. Our hour!", say: "h-our", picture: "⏰", source: "hazel" },
 
   // ----- Years 3 & 4 -----
-  island: { kind: "hidden", hide: "land", text: "An island is land with water all around it.", picture: "🏝️", source: "common" },
-  believe: { kind: "hidden", hide: "lie", text: "Never believe a lie!", picture: "🤥", source: "common" },
-  separate: { kind: "hidden", hide: "rat", text: "There's a rat in separate!", picture: "🐀", source: "common" },
-  address: { kind: "hidden", hide: "dress", text: "I saw an ad for a dress at this address.", picture: "👗📬", source: "common" },
-  heard: { kind: "hidden", hide: "ear", text: "You hear with your ear.", picture: "👂", source: "common" },
-  heart: { kind: "hidden", hide: "ear", text: "There's an ear in heart – listen to your heart!", picture: "👂❤️", source: "suggested" },
-  enough: { kind: "acrostic", text: "Even New Ostriches Use Green Hats", picture: "🐦🎩", source: "common" },
-  height: { kind: "hidden", hide: "eight", text: "There's an eight in height!", picture: "8️⃣📏", source: "suggested" },
-  weight: { kind: "hidden", hide: "eight", text: "There's an eight in weight!", picture: "8️⃣⚖️", source: "suggested" },
-  eighth: { kind: "hidden", hide: "eight", text: "Eighth is eight with an h on the end.", picture: "8️⃣", source: "suggested" },
-  business: { kind: "hidden", hide: "bus", text: "I go to my business on the bus.", picture: "🚌💼", source: "suggested" },
-  February: { kind: "hidden", hide: "ru", text: "Feb-RU-ary: are you (R U) ready for February?", picture: "❄️📅", source: "suggested" },
-  favourite: { kind: "hidden", hide: "our", text: "It's our favourite!", picture: "😍", source: "suggested" },
-  library: { kind: "letters", marks: ["r"], text: "Library has two r's: Read and Return!", picture: "📚", source: "suggested" },
-  answer: { kind: "letters", marks: ["w"], text: "The w is silent – say it the silly way: an-S-W-er.", picture: "🤫", source: "suggested" },
-  knowledge: { kind: "hidden", hide: "ledge", text: "Know + ledge: I know about the ledge!", picture: "🧗", source: "suggested" },
-  woman: { kind: "hidden", hide: "man", text: "One woman, like one man.", picture: "👩", source: "suggested" },
-  women: { kind: "hidden", hide: "men", text: "Two women, like two men.", picture: "👩👩", source: "suggested" },
+  island: { kind: "hidden", hide: "land", text: "An island is land with water all around it.", say: "is-land", picture: "🏝️", source: "known" },
+  believe: { kind: "hidden", hide: "lie", text: "Never believe a lie!", say: "bel-eye-eve", picture: "🤥", source: "known" },
+  separate: { kind: "hidden", hide: "rat", text: "There's a rat in separate!", say: "sep-a-rat-e", picture: "🐀", source: "known" },
+  address: { kind: "letters", marks: ["dd", "ss"], text: "Add a dress to your address – two d's and two s's!", say: "add-dress", picture: "👗📬", source: "known" },
+  heard: { kind: "hidden", hide: "ear", text: "You hear with your ear.", picture: "👂", source: "known" },
+  heart: { kind: "hidden", hide: "ear", text: "There's an ear in heart – listen to your heart!", picture: "👂❤️", source: "hazel" },
+  enough: { kind: "acrostic", text: "Even New Ostriches Use Green Hats", picture: "🐦🎩", source: "known" },
+  caught: { kind: "acrostic", text: "Cats Always Use Great Heavy Toilets", picture: "🐱🚽", source: "known" },
+  business: { kind: "hidden", hide: "bus", text: "Bus-in-ess: I go to my business on the bus.", say: "bus-in-ess", picture: "🚌💼", source: "known" },
+  February: { kind: "letters", marks: ["br"], text: "Brrr! February is cold – don't forget the r after the b.", say: "Feb-roo-ar-y", picture: "🥶❄️", source: "known" },
+  height: { kind: "hidden", hide: "eight", text: "There's an eight in height!", picture: "8️⃣📏", source: "hazel" },
+  weight: { kind: "hidden", hide: "eight", text: "There's an eight in weight!", picture: "8️⃣⚖️", source: "hazel" },
+  eighth: { kind: "hidden", hide: "eight", text: "Eighth is eight with an h on the end.", picture: "8️⃣", source: "hazel" },
+  favourite: { kind: "hidden", hide: "our", text: "It's our favourite!", say: "fa-vour-ite", picture: "😍", source: "hazel" },
+  library: { kind: "letters", marks: ["r"], text: "Library has two r's: Read and Return!", say: "li-brar-y", picture: "📚", source: "hazel" },
+  answer: { kind: "letters", marks: ["w"], text: "The w is silent – say it the silly way to remember it.", say: "an-swer", picture: "🤫", source: "hazel" },
+  knowledge: { kind: "hidden", hide: "ledge", text: "Know + ledge: I know about the ledge!", say: "k-now-ledge", picture: "🧗", source: "hazel" },
+  woman: { kind: "hidden", hide: "man", text: "One woman, like one man.", picture: "👩", source: "hazel" },
+  women: { kind: "hidden", hide: "men", text: "Two women, like two men.", say: "wo-men", picture: "👩👩", source: "hazel" },
 
   // ----- Years 5 & 6 -----
-  necessary: { kind: "letters", marks: ["c", "ss"], text: "One Collar and two Sleeves.", picture: "👔", source: "common" },
-  accommodate: { kind: "letters", marks: ["cc", "mm"], text: "It's big enough to accommodate two Cots and two Mattresses.", picture: "🛏️🛏️", source: "common" },
-  embarrass: { kind: "letters", marks: ["rr", "ss"], text: "I go Really Red and So Shy when I'm embarrassed.", picture: "😳", source: "common" },
-  rhythm: { kind: "acrostic", text: "Rhythm Helps Your Two Hips Move", picture: "💃🥁", source: "common" },
-  parliament: { kind: "hidden", hide: "iam", text: "I am in parliament!", picture: "🏛️🙋", source: "common" },
-  familiar: { kind: "hidden", hide: "liar", text: "That liar looks familiar.", picture: "🤥", source: "common" },
-  environment: { kind: "hidden", hide: "iron", text: "There's iron in environment.", picture: "🌍", source: "common" },
-  secretary: { kind: "hidden", hide: "secret", text: "A secretary keeps a secret.", picture: "🤫📝", source: "suggested" },
-  definite: { kind: "hidden", hide: "fin", text: "De-FIN-ite: a fish's fin is definitely there!", picture: "🐟", source: "suggested" },
-  desperate: { kind: "hidden", hide: "rat", text: "A desperate rat! There's a rat in desperate too.", picture: "🐀", source: "suggested" },
-  government: { kind: "hidden", hide: "govern", text: "The government governs the country.", picture: "🏛️", source: "suggested" },
-  vegetable: { kind: "hidden", hide: "table", text: "Put your vegetables on the table.", picture: "🥦🍽️", source: "suggested" },
-  temperature: { kind: "hidden", hide: "temper", text: "Don't lose your temper when the temperature's high!", picture: "🌡️😤", source: "suggested" },
-  shoulder: { kind: "hidden", hide: "should", text: "You should carry it on your shoulder.", picture: "🎒", source: "suggested" },
-  conscience: { kind: "hidden", hide: "science", text: "There's science in conscience.", picture: "🔬", source: "suggested" },
-  neighbour: { kind: "hidden", hide: "our", text: "Our neighbour!", picture: "🏘️", source: "suggested" },
-  marvellous: { kind: "letters", marks: ["ll"], text: "Marvellous has two lovely l's.", picture: "✨", source: "suggested" },
-  queue: { kind: "letters", marks: ["ueue"], text: "Q, then u-e-u-e: four letters waiting in a queue!", picture: "🧍🧍🧍🧍", source: "suggested" },
-  cemetery: { kind: "letters", marks: ["e"], text: "Cemetery has three e's – you get there with e's (ease)!", picture: "🪦", source: "suggested" },
-  forty: { kind: "letters", marks: ["o"], text: "There's no u in forty, even though there is one in four!", picture: "4️⃣0️⃣", source: "suggested" },
-  yacht: { kind: "acrostic", text: "Yellow Ants Can Hold Teacups", picture: "🐜☕", source: "suggested" },
-  privilege: { kind: "hidden", hide: "leg", text: "It's a privilege to have a leg to stand on!", picture: "🦵", source: "suggested" },
+  necessary: { kind: "letters", marks: ["c", "ss"], text: "One Collar and two Sleeves.", picture: "👔", source: "known" },
+  accommodate: { kind: "letters", marks: ["cc", "mm"], text: "Cosy Cottages and Magnificent Mansions – two c's and two m's.", picture: "🏡🏰", source: "known" },
+  embarrass: { kind: "letters", marks: ["rr", "ss"], text: "I go Really Red and So Shy when I'm embarrassed.", picture: "😳", source: "known" },
+  interrupt: { kind: "letters", marks: ["rr"], text: "It's Really Rude to interrupt!", picture: "🙊", source: "known" },
+  rhythm: { kind: "acrostic", text: "Rhythm Helps Your Two Hips Move", picture: "💃🥁", source: "known" },
+  parliament: { kind: "hidden", hide: "iam", text: "I am in parliament!", say: "par-li-a-ment", picture: "🏛️🙋", source: "known" },
+  familiar: { kind: "hidden", hide: "liar", text: "That liar looks familiar.", say: "fam-i-liar", picture: "🤥", source: "known" },
+  environment: { kind: "hidden", hide: "iron", text: "There's iron in environment.", say: "en-vi-ron-ment", picture: "🌍", source: "known" },
+  definite: { kind: "hidden", hide: "finite", text: "Definite has 'finite' inside it – so it ends in -ite, not -ate.", say: "de-fin-ite", picture: "✅", source: "known" },
+  vegetable: { kind: "hidden", hide: "table", text: "Vege + table: put your vegetables on the table.", say: "veg-e-table", picture: "🥦🍽️", source: "known" },
+  government: { kind: "hidden", hide: "govern", text: "The government governs – don't forget the n.", say: "gov-ern-ment", picture: "🏛️", source: "known" },
+  stomach: { kind: "letters", marks: ["ach"], text: "My stomach aches! Stom + ach.", say: "sto-match", picture: "🤢", source: "known" },
+  vehicle: { kind: "letters", marks: ["h"], text: "There's a hidden h – say it the silly way.", say: "ve-hick-le", picture: "🚗", source: "known" },
+  bargain: { kind: "hidden", hide: "gain", text: "A bargain is a gain!", say: "bar-gain", picture: "🏷️", source: "known" },
+  secretary: { kind: "hidden", hide: "secret", text: "A secretary keeps a secret.", say: "sec-re-tar-y", picture: "🤫📝", source: "hazel" },
+  desperate: { kind: "hidden", hide: "per", text: "Say it the silly way: des-PER-ate – it's per, not par.", say: "des-per-ate", picture: "😫", source: "hazel" },
+  temperature: { kind: "hidden", hide: "temper", text: "Don't lose your temper when the temperature's high!", say: "tem-per-a-ture", picture: "🌡️😤", source: "hazel" },
+  shoulder: { kind: "hidden", hide: "should", text: "You should carry it on your shoulder.", picture: "🎒", source: "hazel" },
+  conscience: { kind: "hidden", hide: "science", text: "There's science in conscience.", say: "con-science", picture: "🔬", source: "hazel" },
+  neighbour: { kind: "hidden", hide: "neigh", text: "The horse says “neigh” to our neighbour!", say: "neigh-bour", picture: "🐴🏡", source: "hazel" },
+  marvellous: { kind: "letters", marks: ["ll"], text: "Marvellous has two lovely l's.", picture: "✨", source: "hazel" },
+  queue: { kind: "letters", marks: ["ueue"], text: "Q, then u-e-u-e: four letters waiting in a queue!", picture: "🧍🧍🧍🧍", source: "hazel" },
+  cemetery: { kind: "letters", marks: ["e"], text: "Cemetery has three e's – you get there with e's (ease)!", picture: "🪦", source: "known" },
+  forty: { kind: "letters", marks: ["o"], text: "There's no u in forty, even though there is one in four!", picture: "4️⃣0️⃣", source: "known" },
+  yacht: { kind: "acrostic", text: "Yellow Ants Can Hold Teacups", picture: "🐜☕", source: "hazel" },
+  privilege: { kind: "hidden", hide: "leg", text: "Two i's, then an e – and it's a privilege to have a leg to stand on!", say: "priv-i-leg-e", picture: "🦵", source: "hazel" },
+  apparent: { kind: "hidden", hide: "parent", text: "There's a parent in apparent.", say: "ap-par-ent", picture: "👨‍👧", source: "hazel" },
+  pronunciation: { kind: "hidden", hide: "nun", text: "There's no 'noun' in pronunciation – there's a nun!", say: "pro-nun-ci-a-tion", picture: "🗣️", source: "known" },
+  recommend: { kind: "letters", marks: ["c", "mm"], text: "I recommend one cake and many muffins: one c, two m's.", picture: "🍰🧁🧁", source: "hazel" },
+  exaggerate: { kind: "letters", marks: ["gg"], text: "Two g's – a Gigantic Giraffe! (But don't exaggerate.)", picture: "🦒", source: "hazel" },
+  lightning: { kind: "hidden", hide: "light", text: "Lightning is light – and too quick to stop for an e!", say: "light-ning", picture: "⚡", source: "hazel" },
 };
 
 export const trick = (word) => TRICKS[word] || null;

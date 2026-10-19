@@ -30,8 +30,9 @@ export function trickCardHtml(word, { compact = false } = {}) {
         <p class="trick-label">🧠 Memory trick</p>
         ${rows}
         <p class="trick-text"><span class="say-text ${t.kind === "acrostic" ? "visually-hidden" : ""}">${esc(t.text)}</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p>
-        ${compact ? "" : `<p class="trick-source">${t.source === "common"
-          ? "⭐ A trick lots of UK schools use"
+        ${t.say ? `<p class="say-silly speakable" data-silly="${esc(t.say)}">🗣️ Say it the silly way: <strong>${esc(t.say)}</strong><button class="say-btn silly-btn" type="button" aria-label="Hear the silly way">🔊</button></p>` : ""}
+        ${compact ? "" : `<p class="trick-source">${t.source === "known"
+          ? "⭐ A well-known spelling trick"
           : "🦔 Hazel's idea – make up your own if you like!"}</p>`}
       </div>
     </div>`;
