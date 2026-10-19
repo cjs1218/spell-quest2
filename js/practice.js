@@ -8,6 +8,7 @@ import { picture } from "./pictures.js";
 import { MISTAKE_TYPES } from "./mistakes.js";
 import { checkMission } from "./mission.js";
 import { companionHtml } from "./companion.js";
+import { praise, spoken } from "./praise.js";
 import { rainbowHtml, setupRainbow } from "./rainbow.js";
 import {
   app, h, esc, on, shuffle, sleep, PLANTS, chunkedWordHtml, beatsLabel,
@@ -29,7 +30,7 @@ function pickSessionWords(fam) {
 }
 
 export function startSession(fam, groupKey, words = null) {
-  const session = { fam, groupKey, words: words || pickSessionWords(fam), index: 0, results: [] };
+  const session = { fam, groupKey, words: words || pickSessionWords(fam), index: 0, results: [], streak: 0 };
   learnStep(session);
 }
 
@@ -175,22 +176,29 @@ function feedbackStep(session, attempt, answer) {
   if (attempt === 1) {
     result = recordAttempt(word, correct, answer);
     session.results.push({ word, correct, box: result.state.box });
+    session.streak = correct ? session.streak + 1 : 0;
     if (result.seedsEarned) toast(`+${result.seedsEarned} 🌰`);
   }
 
   if (correct) {
     const box = wordState(word).box;
     const msg = box >= MASTERED_BOX ? "Your flower is fully grown!" : "Your plant grew!";
+    const headline = praise(attempt === 1 ? "correct" : "retry");
+    const comment = result?.mastered
+      ? companionHtml("mastered")
+      : attempt === 1 && session.streak >= 3
+        ? companionHtml("streak", { vars: { n: session.streak } })
+        : companionHtml("correct");
     app.innerHTML = h`
       <div class="celebrate">
         <div class="burst" aria-hidden="true">✨${plantFor(box)}✨</div>
-        <h2>${attempt === 1 ? "Brilliant!" : "You got it!"}</h2>
+        <h2>${esc(headline)}</h2>
         <p class="big-word small chopped">${chunkedWordHtml(word)}</p>
         <p>${msg}</p>
-        ${companionHtml(result?.mastered ? "mastered" : "correct")}
+        ${comment}
         <button class="btn primary big" id="next">Next</button>
       </div>`;
-    say(attempt === 1 ? "Brilliant!" : "You got it!");
+    say(spoken(headline));
     on("#next", "click", () => nextWord(session));
     return;
   }
@@ -238,10 +246,11 @@ function nextWord(session) {
 function endScreen(session) {
   const right = session.results.filter((r) => r.correct).length;
   const missionDone = checkMission();
+  const headline = praise(right === session.results.length && right > 0 ? "perfect" : "end");
   app.innerHTML = h`
     <div class="celebrate">
       <div class="burst" aria-hidden="true">${session.results.map((r) => plantFor(r.box)).join(" ")}</div>
-      <h2>Great practice!</h2>
+      <h2>${esc(headline)}</h2>
       <p>You practised ${session.results.length} words and spelt ${right} first time.</p>
       ${missionDone ? `<div class="tip card mission-done">🏅 Weekly mission complete! +10 🌰</div>` : ""}
       ${companionHtml("end")}
@@ -251,6 +260,6 @@ function endScreen(session) {
         <a class="btn" href="#/year/${session.groupKey}">Back</a>
       </div>
     </div>`;
-  say(missionDone ? "Great practice! You finished your weekly mission!" : "Great practice!");
+  say(spoken(headline) + (missionDone ? " You finished your weekly mission!" : ""));
   on("#again", "click", () => startSession(session.fam, session.groupKey));
 }

@@ -44,6 +44,9 @@ Every word a child learns grows into a flower in their spelling garden.
 - **Seeds 🌰** earned from practice and games buy new flower types and garden
   decorations (bees, ladybirds, a pond fountain, a rainbow...).
 - **Hazel the hedgehog** 🦔 cheers children on, and never scolds.
+- **Lots of praise** (around 170 lines in `js/praise.js`): headlines, Hazel's
+  comments, streaks ("4 in a row!"), perfect sessions and game cheers. Each list
+  is used up before anything repeats, and lines often use the child's name.
 - **A weekly mission**, such as "Grow 3 plants in a family" or "Play 2 word games".
 - Badges for practice days and "comeback" words.
 
@@ -111,7 +114,8 @@ js/rainbow.js          rainbow writing canvas
 js/store.js            profiles, progress, spaced repetition, seeds, missions (localStorage)
 js/mission.js          weekly missions
 js/mistakes.js         sorts mistakes into patterns
-js/companion.js        Hazel the hedgehog's lines
+js/companion.js        Hazel the hedgehog
+js/praise.js           all praise and encouragement lines
 js/groups.js           year groups plus the school list
 js/words.js            word lists grouped into families, plus memory tricks
 js/syllables.js        syllable splits, plus automatic splitting for new words

@@ -5,6 +5,7 @@
 
 import { esc, h, on } from "./ui.js";
 import { say } from "./speech.js";
+import { praise, spoken } from "./praise.js";
 
 export const RAINBOW = [
   { name: "red", hex: "#e53935" },
@@ -183,16 +184,18 @@ export function setupRainbow(root, word, onDone) {
     meter.style.background = colour().hex;
   }
 
+  let lastCheer = "";
+
   function updateText() {
     starsEl.innerHTML = starsHtml(goes);
     starsEl.setAttribute("aria-label", `${Math.min(goes, NEEDED)} of ${NEEDED} done`);
     if (goes >= NEEDED) {
-      countEl.textContent = "Three stars! Beautiful rainbow writing! 🌈";
+      countEl.textContent = lastCheer;
       starsEl.classList.add("all-done");
     } else if (goes === 0) {
       countEl.textContent = `Trace the whole word in ${colour().name}.`;
     } else {
-      countEl.textContent = `${goes === 1 ? "One" : "Two"} done! Now trace it in ${colour().name}.`;
+      countEl.textContent = `${lastCheer} ${goes === 1 ? "That's one!" : "That's two!"} Now trace it in ${colour().name}.`;
     }
     done.disabled = goes < NEEDED;
   }
@@ -203,7 +206,8 @@ export function setupRainbow(root, word, onDone) {
     pop.classList.remove("show");
     void pop.offsetWidth;
     pop.classList.add("show");
-    say(goes >= NEEDED ? "Three stars!" : goes === 1 ? "One!" : "Two!");
+    lastCheer = goes >= NEEDED ? praise("rainbow") : praise("star");
+    say(spoken(goes >= NEEDED ? lastCheer.split("!")[0] + "!" : `${lastCheer} ${goes === 1 ? "One!" : "Two!"}`));
     // Move on to the next rainbow colour automatically.
     if (goes < NEEDED) chooseColour((colourIndex + 1) % RAINBOW.length);
     updateMeter();

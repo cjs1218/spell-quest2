@@ -9,6 +9,7 @@ import { picture } from "./pictures.js";
 import { BUILDS, DISTRACTORS } from "./builder.js";
 import { say, stop } from "./speech.js";
 import { companionHtml } from "./companion.js";
+import { praise, spoken } from "./praise.js";
 import { rainbowHtml, setupRainbow } from "./rainbow.js";
 import {
   app, h, esc, on, shuffle, pick, sleep, header, seedBadge, chunkedWordHtml,
@@ -74,10 +75,11 @@ function nextRound(ctx, play) {
 function finish(ctx) {
   recordGamePlayed();
   const missionDone = checkMission();
+  const headline = praise("gameEnd");
   app.innerHTML = h`
     <div class="celebrate">
       <div class="burst" aria-hidden="true">${ctx.game.icon}🏅</div>
-      <h2>Game complete!</h2>
+      <h2>${esc(headline)}</h2>
       <p>You got ${ctx.score} out of ${ctx.total ?? ROUNDS} right.</p>
       ${missionDone ? `<div class="tip card mission-done">🏅 Weekly mission complete! +10 🌰</div>` : ""}
       ${companionHtml("end")}
@@ -86,7 +88,7 @@ function finish(ctx) {
         <a class="btn" href="#/year/${ctx.groupKey}">Back</a>
       </div>
     </div>`;
-  say(missionDone ? "Game complete! You finished your weekly mission!" : "Game complete!");
+  say(spoken(headline) + (missionDone ? " You finished your weekly mission!" : ""));
   on("#again", "click", () => gameScreen(ctx.game.id, ctx.groupKey));
 }
 
@@ -127,7 +129,7 @@ function sortGame(ctx) {
       e.currentTarget.querySelector(".basket-words").insertAdjacentHTML("beforeend", `<span class="in-basket">${esc(item.w)}</span>`);
       selected.remove();
       selected = null;
-      app.querySelector("#msg").innerHTML = feedbackRow(true, `Yes! ${esc(item.w)} goes with ${esc(fams[fi].name)}.`);
+      app.querySelector("#msg").innerHTML = feedbackRow(true, `${esc(praise("game"))} ${esc(item.w)} goes with ${esc(fams[fi].name)}.`);
       if (!app.querySelector(".chip")) setTimeout(() => finish(ctx), 900);
     } else {
       firstTry = false;
@@ -162,7 +164,7 @@ function oddGame(ctx) {
       e.currentTarget.classList.add("right");
       app.querySelectorAll(".odd-card").forEach((c) => (c.disabled = true));
       app.querySelector("#msg").innerHTML = feedbackRow(true,
-        `Well spotted! The others are all “${esc(main.name)}”. ${esc(main.tip)}`);
+        `${esc(praise("spotted"))} The others are all “${esc(main.name)}”. ${esc(main.tip)}`);
       app.querySelector("#next").hidden = false;
     } else {
       tries += 1;
@@ -282,7 +284,7 @@ function pictureGame(ctx) {
     if (get().toLowerCase() === word.toLowerCase()) {
       solved = true;
       if (tries === 0) win(ctx);
-      app.querySelector("#msg").innerHTML = feedbackRow(true, `Brilliant! ${esc(word)}`);
+      app.querySelector("#msg").innerHTML = feedbackRow(true, `${esc(praise("game"))} ${esc(word)}`);
       check.textContent = "Next";
     } else {
       tries += 1;
@@ -329,7 +331,7 @@ function drumGame(ctx) {
     if (taps === beats) {
       solved = true;
       if (tries === 0) win(ctx);
-      app.querySelector("#msg").innerHTML = feedbackRow(true, `Yes! ${beatsLabel(beats)}: <span class="inline-chop">${chunkedWordHtml(word)}</span>`);
+      app.querySelector("#msg").innerHTML = feedbackRow(true, `${esc(praise("game"))} ${beatsLabel(beats)}: <span class="inline-chop">${chunkedWordHtml(word)}</span>`);
       e.currentTarget.textContent = "Next";
       app.querySelector("#drum").disabled = true;
       stop();
