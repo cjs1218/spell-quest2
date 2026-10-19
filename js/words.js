@@ -16,8 +16,8 @@ export const YEAR_GROUPS = {
       },
       {
         id: "y1-was",
-        name: "is, was and were",
-        tip: "In these words the s often says 'z': hiZ, haZ, waZ.",
+        name: "is, was, were and are",
+        tip: "These little words don't sound how they look. In is, his, has and was, the s says 'z'.",
         words: ["is", "his", "has", "was", "were", "are"],
       },
       {
@@ -176,8 +176,8 @@ export const YEAR_GROUPS = {
       },
       {
         id: "y34-split",
-        name: "Long sounds with a magic e",
-        tip: "The e at the end makes the vowel say its name: compl-E-te, ext-R-E-me.",
+        name: "A silent e on the end",
+        tip: "These words end in an e you can't hear. Sometimes it makes the vowel say its name (complete), sometimes not (promise). Watch out: breath has no e, but breathe does!",
         words: ["complete", "extreme", "describe", "imagine", "increase", "purpose", "promise", "believe", "breathe", "breath"],
       },
       {
@@ -231,19 +231,25 @@ export const YEAR_GROUPS = {
         id: "y56-ence",
         name: "-ence, -ance and -ent",
         tip: "These sound alike. Link them to a word you know: exist → existence.",
-        words: ["convenience", "existence", "hindrance", "relevant", "nuisance", "secretary", "sincere", "sincerely"],
+        words: ["convenience", "existence", "hindrance", "relevant", "nuisance"],
       },
       {
         id: "y56-ise",
         name: "British -ise and -ice",
         tip: "In British English we usually write -ise: recognise, criticise.",
-        words: ["criticise", "recognise", "sacrifice", "prejudice", "privilege"],
+        words: ["criticise", "recognise", "sacrifice", "prejudice"],
       },
       {
         id: "y56-ous",
-        name: "-ous and -ious",
-        tip: "disastrous loses the 'e' from disaster. marvellous doubles the l.",
-        words: ["disastrous", "marvellous", "curiosity", "definite", "desperate", "determined"],
+        name: "-ous words and their families",
+        tip: "Watch what changes: disaster loses its e (disastrous), marvel doubles its l (marvellous), and curious loses its u (curiosity).",
+        words: ["disastrous", "marvellous", "curiosity"],
+      },
+      {
+        id: "y56-middle",
+        name: "Sneaky middle vowels",
+        tip: "The middle vowel is hard to hear, so say it clearly when you practise: def-I-nite, desp-E-rate, de-TER-mined, priv-I-lege.",
+        words: ["definite", "desperate", "determined", "privilege"],
       },
       {
         id: "y56-tricky-a",
@@ -267,7 +273,7 @@ export const YEAR_GROUPS = {
         id: "y56-tricky-d",
         name: "Tricky words – set D",
         tip: "Make your own memory trick – the sillier, the better!",
-        words: ["stomach", "symbol", "system", "temperature", "thorough", "twelfth", "vegetable", "vehicle"],
+        words: ["stomach", "symbol", "system", "temperature", "thorough", "twelfth", "vegetable", "vehicle", "secretary", "sincere", "sincerely"],
       },
     ],
   },

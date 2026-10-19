@@ -1,4 +1,6 @@
 // Checks every statutory / common exception word appears exactly once per year group.
+// The lists below were checked against the Department for Education's
+// "English Appendix 1: Spelling" (National Curriculum in England) in October 2026.
 // Run: node tools/check-words.mjs
 import { YEAR_GROUPS } from "../js/words.js";
 import { SYLLABLES } from "../js/syllables.js";
