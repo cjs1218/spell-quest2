@@ -5,7 +5,7 @@ import { trickCardHtml, trickWordHtml } from "./trickview.js";
 import { wordState, isDue, recordAttempt, MASTERED_BOX, garden, grewToday } from "./store.js";
 import { alignSpelling, describeDifference } from "./align.js";
 import { instructionHtml, readInstruction, withSayButton } from "./readaloud.js";
-import { say, sayLetter, stop, cheer, warm } from "./speech.js";
+import { say, sayLetter, stop, cheer, warm, sayChunk } from "./speech.js";
 import { sound } from "./sounds.js";
 import { chunks } from "./syllables.js";
 import { picture } from "./pictures.js";
@@ -70,7 +70,7 @@ async function chopAnimation(big, word) {
   big.classList.add("chopped");
   for (const el of big.querySelectorAll(".syl")) {
     el.classList.add("lit");
-    await say(el.dataset.syl, { rate: 0.7 });
+    await sayChunk(el.dataset.syl, { rate: 0.7 });
     await sleep(250);
     el.classList.remove("lit");
   }

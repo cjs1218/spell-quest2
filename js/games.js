@@ -7,7 +7,7 @@ import { checkMission } from "./mission.js";
 import { chunks } from "./syllables.js";
 import { gamePicture as picture } from "./pictures.js";
 import { BUILDS, DISTRACTORS } from "./builder.js";
-import { say, stop, cheer, warm } from "./speech.js";
+import { say, stop, cheer, warm, sayChunk } from "./speech.js";
 import { sound } from "./sounds.js";
 import { companionHtml } from "./companion.js";
 import { instructionHtml, readInstruction, withSayButton } from "./readaloud.js";
@@ -347,7 +347,7 @@ function drumGame(ctx) {
     e.currentTarget.classList.add("hit");
     sound("pop");
     const syl = chunks(word)[taps - 1];
-    if (syl) say(syl, { rate: 0.75 });
+    if (syl) sayChunk(syl);
   });
   on("#reset", "click", () => { taps = 0; app.querySelector("#taps").textContent = 0; });
   let solved = false;
@@ -363,7 +363,7 @@ function drumGame(ctx) {
       app.querySelector("#drum").disabled = true;
       stop();
       await cheer(spoken(line));
-      for (const s of chunks(word)) { await say(s, { rate: 0.75 }); await sleep(150); }
+      for (const s of chunks(word)) { await sayChunk(s); await sleep(150); }
     } else {
       tries += 1;
       app.querySelector("#msg").innerHTML = feedbackRow(false,

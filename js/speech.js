@@ -101,3 +101,60 @@ export function stop() {
 export function sayLetter(letter) {
   return say(letter.toLowerCase(), { rate: 0.7 });
 }
+
+// ---------- saying part of a word ----------
+// Device voices treat some chunks as abbreviations ("tel" → "telephone",
+// "Feb" → "February", "ca" → "California", "ny" → "New York") or read them as
+// letters ("ac" → "A C"). When we say a syllable on its own we respell it so
+// it's said the way it sounds inside the word.
+
+const CHUNK_SOUNDS = {
+  // abbreviations a voice might expand
+  tel: "tell", feb: "febb", jan: "jann", mar: "mahr", apr: "ape", jun: "jun", jul: "jool",
+  aug: "awg", sep: "sepp", sept: "sept", oct: "ockt", nov: "novv", dec: "deck",
+  mon: "mun", tue: "tyoo", thu: "thuh", fri: "fry", sec: "seck", min: "minn", hr: "hur",
+  gov: "guv", govt: "guv", dept: "dept", est: "esst", st: "sst", dr: "durr", rd: "rud",
+  ave: "av", co: "koh", inc: "ink", ft: "fft", vs: "verse", etc: "et", no: "no",
+  // two-letter chunks voices may spell out or expand
+  ab: "abb", ac: "ack", ad: "add", af: "aff", ag: "agg", ap: "app", av: "avv",
+  im: "imm", oc: "ock", og: "ogg", om: "omm", op: "opp", os: "oss",
+  ca: "kuh", pa: "puh", ma: "muh", va: "vuh", na: "nuh", ta: "tuh", fa: "fay",
+  de: "dih", di: "dih", ri: "ree", li: "lie", ci: "sih", ni: "nih", ti: "tih", si: "sih",
+  vi: "vih", bi: "by", pe: "pih", re: "rih", te: "tuh", ve: "vee", tu: "choo", su: "shoo",
+  cu: "kyoo", mu: "myoo", sy: "see", mo: "moh", lo: "loh", wo: "wih", wa: "wor", pla: "plah",
+  rhy: "rih", al: "ul",
+  // endings that sound different from how they look
+  y: "ee", ey: "ee", ly: "lee", ny: "nee", py: "pee", ry: "ree", ty: "tee", cy: "see",
+  ble: "bul", cle: "kul", ple: "pul", le: "ul", thm: "thum", ue: "yoo",
+  tion: "shun", sion: "shun", cial: "shul", cient: "shunt", scious: "shuss",
+  ture: "cher", sure: "shur", ous: "us", lous: "luss", mous: "muss", trous: "truss", vous: "vuss",
+  ough: "uh", nough: "nuff", eign: "in", guage: "gwij", teur: "tur", dier: "jer",
+  chie: "chee", chieve: "cheev", lieve: "leev", lia: "luh", iar: "yer", bour: "bur", vour: "vur",
+  gramme: "gram", ise: "ize", nise: "nize", cise: "size", dice: "diss", fice: "fiss", tice: "tiss",
+  cine: "sin", site: "zit", ite: "it", nite: "nit", ine: "in", mined: "mind", age: "ij",
+};
+
+const COMMON_WORDS = new Set(["a", "i", "am", "an", "as", "at", "be", "by", "do", "go", "he", "if", "in", "is", "it",
+  "me", "my", "of", "on", "or", "so", "to", "up", "us", "we", "ex", "em", "en", "es", "eye", "our", "now"]);
+const SHORT_VOWEL = { a: "uh", e: "eh", i: "ih", o: "oh", u: "oo" };
+
+/** How to say a chunk of a word on its own so the voice doesn't misread it. */
+export function chunkSound(chunk) {
+  const c = String(chunk).toLowerCase();
+  if (CHUNK_SOUNDS[c]) return CHUNK_SOUNDS[c];
+  if (COMMON_WORDS.has(c)) return c;
+  // No vowels at all (e.g. "st"): add a little "uh" so it's sayable.
+  if (/^[bcdfghjklmnpqrstvwxz]+$/.test(c)) return `${c}uh`;
+  // consonant + y at the end says "ee": "py" → "pee"
+  if (/^[bcdfghjklmnpqrstvwxz]+y$/.test(c)) return c.replace(/y$/, "ee");
+  // two letters, consonant + vowel ("ba"): use the short vowel sound
+  if (/^[bcdfghjklmnpqrstvwxz][aeiou]$/.test(c)) return c[0] + SHORT_VOWEL[c[1]];
+  // two letters, vowel + consonant ("ub"): double the consonant so it isn't spelt out
+  if (/^[aeiou][bcdfghjklmnpqrstvwxz]$/.test(c)) return c + (c[1] === "c" ? "k" : c[1]);
+  return c;
+}
+
+/** Say one syllable or chunk of a word. */
+export function sayChunk(chunk, opts = {}) {
+  return say(chunkSound(chunk), { rate: 0.75, ...opts });
+}

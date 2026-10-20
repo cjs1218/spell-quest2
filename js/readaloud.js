@@ -4,7 +4,7 @@
 //  - anything marked .speakable gets a 🔊 button that reads it out
 
 import { getSettings } from "./store.js";
-import { say, warm, stop } from "./speech.js";
+import { say, warm, stop, sayChunk } from "./speech.js";
 import { esc } from "./ui.js";
 
 const sayBtn = `<button class="say-btn" type="button" aria-label="Read this out">🔊</button>`;
@@ -41,7 +41,7 @@ document.addEventListener("click", (e) => {
   const silly = btn.closest("[data-silly]")?.dataset.silly;
   if (silly) {
     stop();
-    (async () => { for (const part of silly.split("-")) await say(part, { rate: 0.7 }); })();
+    (async () => { for (const part of silly.split("-")) await sayChunk(part, { rate: 0.7 }); })();
     return;
   }
   const box = btn.closest(".speakable");

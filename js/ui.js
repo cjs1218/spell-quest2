@@ -1,7 +1,7 @@
 // Small shared helpers for building screens.
 
 import { chunks } from "./syllables.js";
-import { stop, say, sayLetter } from "./speech.js";
+import { stop, say, sayLetter, sayChunk } from "./speech.js";
 import { getSettings, seeds } from "./store.js";
 
 export const app = document.getElementById("app");
@@ -94,7 +94,7 @@ export function setupTiles(root, slotsNeeded, { isChunks = false, onChange } = {
     if (t.disabled || placed.length >= slotsNeeded) return;
     t.disabled = true;
     placed.push(t);
-    if (isChunks) say(t.textContent, { rate: 0.7 });
+    if (isChunks) sayChunk(t.textContent, { rate: 0.7 });
     else sayLetter(t.textContent);
     render();
   }, root);
