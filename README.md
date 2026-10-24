@@ -123,7 +123,9 @@ about a week. To protect each child's garden:
 Following the [British Dyslexia Association style guide](https://www.bdadyslexia.org.uk/advice/employers/creating-a-dyslexia-friendly-workplace/dyslexia-friendly-style-guide):
 
 - Off-white background by default, with cream, blue, green, peach, grey and dark tints
-- Lexend or Atkinson Hyperlegible fonts, adjustable size and letter spacing
+- Lexend, Atkinson Hyperlegible or **OpenDyslexic** (a free font designed for dyslexic
+  readers, bundled in `fonts/` under the SIL Open Font License so it works offline),
+  with adjustable size and letter spacing
 - No italics, no timers, no lives, no clutter
 - Audio for every word, with adjustable speed
 - A lively, excited voice for praise and a gentle one for encouragement, while

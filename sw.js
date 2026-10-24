@@ -3,7 +3,7 @@
 // refreshed in the background so updates arrive on the next visit.
 // Bump VERSION when files are added or removed.
 
-const VERSION = "spellquest-v8";
+const VERSION = "spellquest-v9";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -12,6 +12,8 @@ const APP_FILES = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
+  "./fonts/OpenDyslexic-Regular.woff2",
+  "./fonts/OpenDyslexic-Bold.woff2",
   ...[
     "app", "builder", "companion", "games", "garden", "groups", "mission", "mistakes",
     "pictures", "practice", "praise", "rainbow", "screens", "sounds", "speech", "store",

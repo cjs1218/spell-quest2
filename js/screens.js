@@ -333,7 +333,9 @@ export function settingsScreen() {
       ${opt("tint", "peach", "Peach")}${opt("tint", "grey", "Grey")}${opt("tint", "dark", "Dark")}
     </fieldset>
     <fieldset class="card"><legend>Letters</legend>
-      ${opt("font", "lexend", "Lexend")}${opt("font", "atkinson", "Atkinson Hyperlegible")}${opt("font", "system", "Device font")}
+      ${opt("font", "lexend", `<span class="font-preview-lexend">Lexend</span>`)}${opt("font", "atkinson", `<span class="font-preview-atkinson">Atkinson Hyperlegible</span>`)}
+      ${opt("font", "opendyslexic", `<span class="font-preview-opendyslexic">OpenDyslexic</span>`)}${opt("font", "system", "Device font")}
+      <p class="muted small">OpenDyslexic is a font made for dyslexic readers: heavier letter bottoms help stop b, d, p and q flipping. Try each and pick the one that feels easiest to read.</p>
     </fieldset>
     <fieldset class="card"><legend>Letter spacing</legend>
       ${opt("spacing", "normal", "Normal")}${opt("spacing", "wide", "Wide")}

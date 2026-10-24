@@ -85,7 +85,7 @@ export function grownUpsGuideScreen() {
         <ol>
           <li><strong>Install it on your tablet or phone.</strong> On iPad or iPhone: open it in Safari, tap <strong>Share ⬆️</strong>, then <strong>Add to Home Screen</strong>. On Android or a computer: use the browser menu and choose <strong>Install app</strong>. From then on, open it from the 🌻 icon. It works without internet, and your child's progress won't be cleared.</li>
           <li><strong>Add your child.</strong> Tap the animal picture at the top of the home screen, then <strong>Add a child</strong>. Choose a name, a picture and their <strong>school year</strong>, which decides which new words they get. Brothers and sisters each get their own garden.</li>
-          <li><strong>Choose how it looks and sounds.</strong> Tap ⚙️ for background colour, letters, text size, letter spacing, voice and talking speed. Let your child choose the colour and font they find easiest to read; this varies a lot between children.</li>
+          <li><strong>Choose how it looks and sounds.</strong> Tap ⚙️ for background colour, letters (including <strong>OpenDyslexic</strong>, a font made for dyslexic readers), text size, letter spacing, voice and talking speed. Let your child choose the colour and font they find easiest to read; this varies a lot between children.</li>
           <li><strong>Pick a nice voice.</strong> In ⚙️ Settings, try the voices marked ⭐. On iPad you can download better ones: <em>Settings → Accessibility → Spoken Content → Voices → English (UK)</em>, for example <em>Serena</em> or <em>Kate (Enhanced)</em>.</li>
           <li><strong>Add this week's school spellings</strong> if your child has them (see section 6).</li>
         </ol>
