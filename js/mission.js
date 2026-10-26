@@ -2,7 +2,7 @@
 
 import {
   getMission, setMission, isoWeek, lastGroup, wordState, MASTERED_BOX,
-  gamesThisWeek, daysThisWeek, addSeeds, SEEDS,
+  gamesThisWeek, daysThisWeek, addSeeds, SEEDS, bumpStat,
 } from "./store.js";
 import { getGroups } from "./groups.js";
 
@@ -57,6 +57,7 @@ export function checkMission() {
   if (!m.done && m.progress >= m.target) {
     setMission({ ...getMission(), done: true });
     addSeeds(SEEDS.mission);
+    bumpStat("missions");
     return true;
   }
   return false;

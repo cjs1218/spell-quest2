@@ -649,3 +649,60 @@ select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem
 .print-only { display: none; }
 @media print { .print-only { display: block; } }
 .kid-step strong { font-size: 1.15rem; }
+
+/* ---------- Garden areas, wardrobe and visitors ---------- */
+.area-tabs { display: flex; gap: 0.45rem; overflow-x: auto; padding: 0.15rem 0.1rem 0.6rem; margin: 0 -0.1rem; scrollbar-width: none; }
+.area-tabs::-webkit-scrollbar { display: none; }
+.area-tab {
+  flex: none; display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 4.6rem;
+  padding: 0.45rem 0.5rem; border-radius: 1rem; border: 2px solid var(--line); background: var(--card);
+  color: var(--text); font: inherit; cursor: pointer;
+}
+.area-tab span { font-size: 1.6rem; line-height: 1.1; }
+.area-tab small { font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.area-tab.active { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
+.area-tab.locked { opacity: 0.6; }
+
+.garden-plot { background: linear-gradient(var(--sky, #e8f5e9) 0%, var(--sky, #e8f5e9) 45%, var(--ground, #a1887f) 100%); }
+.garden-plot.area-moon .area-empty, .garden-plot.area-moon { color: #fff; }
+.garden-plot.locked { display: block; text-align: center; min-height: 0; filter: saturate(0.6); }
+.locked-msg { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.2rem 0 0.6rem; }
+.lock-icon { font-size: 2.4rem; }
+.decor.visitor { animation: bob 3.5s ease-in-out infinite; }
+.shop.preview .shop-item { opacity: 0.55; cursor: default; }
+
+.garden-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0.4rem 0 0.9rem; }
+.garden-tab {
+  padding: 0.6rem 0.3rem; border-radius: 0.9rem; border: 2px solid var(--line); background: var(--card);
+  color: var(--text); font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer; line-height: 1.25;
+}
+.garden-tab.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.garden-panel h3 { margin-top: 0.9rem; }
+
+/* Hazel and her outfit */
+.hedgehog { position: relative; display: inline-block; flex: none; }
+.hedgehog .hog { display: inline-block; }
+.hedgehog .acc { position: absolute; line-height: 1; pointer-events: none; }
+.hedgehog .acc-hat { font-size: 0.55em; top: -0.32em; left: 0.36em; transform: rotate(-12deg); }
+.hedgehog .acc-face { font-size: 0.34em; top: 0.38em; left: 0.08em; }
+.hedgehog .acc-neck { font-size: 0.38em; bottom: 0.08em; left: 0.38em; }
+.hedgehog .acc-held { font-size: 0.5em; bottom: 0; right: -0.32em; }
+.hedgehog.big { font-size: 6rem; }
+.hazel-stage { display: flex; justify-content: center; padding: 1.2rem 0 0.4rem; }
+
+/* Visitors sticker book */
+.sticker-book { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.6rem; margin-top: 0.8rem; }
+.sticker {
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.15rem; padding: 0.7rem 0.5rem;
+  border-radius: 1rem; border: 2px dashed var(--line); background: var(--card); position: relative;
+}
+.sticker.found { border-style: solid; border-color: var(--good); }
+.sticker-icon { font-size: 2.4rem; line-height: 1.1; }
+.sticker.missing .sticker-icon { filter: brightness(0); opacity: 0.18; }
+.sticker small { color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
+.sticker .say-btn { position: absolute; top: 0.3rem; right: 0.3rem; width: 1.7rem; height: 1.7rem; margin: 0; }
+
+/* New reward celebration */
+.reward-card { border-color: var(--accent); text-align: left; }
+.reward-line { display: flex; gap: 0.7rem; align-items: center; margin: 0.3rem 0 0.6rem; }
+.reward-icon { font-size: 2.4rem; animation: star-pop 0.6s ease-out; }

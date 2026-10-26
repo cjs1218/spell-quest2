@@ -79,8 +79,19 @@ school lists, keeping progress safe, and questions and fixes. It can be printed.
 - **A garden that grows** 🟫 → 🌱 → 🌿 → 🌷 → 🌻 with every word. Every right
   answer counts: four dots under each word fill up, and families and year groups
   show a "% grown" bar, so progress is visible long before a flower is fully grown.
-- **Seeds 🌰** earned from practice and games buy new flower types and garden
-  decorations (bees, ladybirds, a pond fountain, a rainbow...).
+- **Seeds 🌰** earned from practice and games buy flowers, decorations and outfits.
+  Spelling earns more than games: 2 for a word that grows, 1 for practising it
+  again the same day, a bonus 5 for a fully grown flower, and 1 per game round won.
+- **New garden areas** open as words become fully grown: 🌼 Meadow (8 flowers),
+  🦆 Pond (20), 🌲 Woodland (35), 🏖️ Seaside (55) and 🚀 Moon garden (80), each
+  with its own shop of 12 things to buy and place.
+- **Visitors sticker book:** 20 animals that come to the garden for learning
+  milestones (first flower, practising on 7 days, 8 right in a row, growing a whole
+  family, a word with 10+ letters...). They're earned, never bought, and show as
+  silhouettes with a hint until found.
+- **Hazel's wardrobe:** hats, glasses, scarves and things to hold. Hazel wears
+  her outfit everywhere she appears.
+- Nothing is random, nothing expires, and nothing is lost by missing a day.
 - **Hazel the hedgehog** 🦔 cheers children on, and never scolds.
 - **Lots of praise** (around 170 lines in `js/praise.js`): headlines, Hazel's
   comments, streaks ("4 in a row!"), perfect sessions and game cheers. Each list
@@ -169,7 +180,8 @@ js/app.js              router
 js/screens.js          home, year groups, families, profiles, settings, grown-ups, school list, print
 js/practice.js         look & listen → spell → feedback flow
 js/games.js            the six word games
-js/garden.js           garden and seed shop
+js/garden.js           garden areas, shops, Hazel's wardrobe and visitors book
+js/rewards.js          garden areas, visitors and wardrobe items, and when they're earned
 js/rainbow.js          rainbow writing canvas
 js/store.js            profiles, progress, spaced repetition, seeds, missions (localStorage)
 js/mission.js          weekly missions

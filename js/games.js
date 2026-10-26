@@ -2,7 +2,8 @@
 // gives gentle feedback, and earns seeds.
 
 import { getGroup, allWords, patternFamilies } from "./groups.js";
-import { addSeeds, recordGamePlayed, SEEDS, wordState, MASTERED_BOX, recordAttempt } from "./store.js";
+import { addSeeds, recordGamePlayed, SEEDS, wordState, MASTERED_BOX, recordAttempt, bumpStat } from "./store.js";
+import { checkRewards, rewardsHtml, rewardsSpeech } from "./rewards.js";
 import { checkMission } from "./mission.js";
 import { chunks } from "./syllables.js";
 import { gamePicture as picture } from "./pictures.js";
@@ -78,7 +79,9 @@ function nextRound(ctx, play) {
 
 function finish(ctx) {
   recordGamePlayed();
+  bumpStat("games");
   const missionDone = checkMission();
+  const rewards = checkRewards();
   const headline = praise("gameEnd");
   app.innerHTML = h`
     <div class="celebrate">
@@ -86,6 +89,7 @@ function finish(ctx) {
       <h2>${esc(headline)}</h2>
       <p>You got ${ctx.score} out of ${ctx.total ?? ROUNDS} right.</p>
       ${missionDone ? `<div class="tip card mission-done">🏅 Weekly mission complete! +10 🌰</div>` : ""}
+      ${rewardsHtml(rewards)}
       ${companionHtml("end")}
       <div class="row">
         <button class="btn primary big" id="again">Play again</button>
@@ -93,7 +97,7 @@ function finish(ctx) {
       </div>
     </div>`;
   sound("fanfare");
-  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : ""}`);
+  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : ""} ${rewardsSpeech(rewards)}`);
   on("#again", "click", () => gameScreen(ctx.game.id, ctx.groupKey));
 }
 

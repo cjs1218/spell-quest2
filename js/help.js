@@ -4,6 +4,7 @@
 import { currentProfile, markHelpSeen } from "./store.js";
 import { say, warm, stop, cheer } from "./speech.js";
 import { app, h, esc, on, header } from "./ui.js";
+import { hazelHtml } from "./companion.js";
 
 // ---------- children ----------
 
@@ -14,7 +15,9 @@ const KID_STEPS = [
   { icon: "🙈", title: "Hide it, then spell it", text: "Tap I'm ready. Then build the word or type it." },
   { icon: "🤔", title: "Stuck? That's OK!", text: "Tap 👀 to peek. Orange letters show what to fix." },
   { icon: "🌻", title: "Grow your garden", text: "Right answers grow plants. Come back tomorrow to grow more!" },
-  { icon: "🌰", title: "Spend your seeds", text: "Buy flowers, bees and more for your garden." },
+  { icon: "🌰", title: "Spend your seeds", text: "Buy things for your garden, and dress up Hazel!" },
+  { icon: "🗺️", title: "Open new places", text: "Grow more flowers to open the meadow, the pond and more." },
+  { icon: "🦋", title: "Collect visitors", text: "Animals come to visit when you reach a goal." },
   { icon: "🎲", title: "Play games", text: "Pick a year to find the games." },
   { icon: "🔊", title: "Tap a speaker", text: "I'll read the words to you." },
 ];
@@ -24,7 +27,7 @@ export function kidsHelpScreen() {
   app.innerHTML = h`
     ${header("#/", "How to play")}
     <div class="companion" role="status">
-      <span class="hedgehog" aria-hidden="true">🦔</span>
+      ${hazelHtml()}
       <p class="bubble speakable"><span class="say-text">Hi ${esc(me?.name || "friend")}! I'm Hazel. Here's how we grow words together.</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p>
     </div>
     <button class="btn big" id="read-all">🔊 Read it all to me</button>

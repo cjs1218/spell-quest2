@@ -7,6 +7,7 @@ import { esc, h, on } from "./ui.js";
 import { say, cheer } from "./speech.js";
 import { sound } from "./sounds.js";
 import { praise, spoken } from "./praise.js";
+import { bumpStat } from "./store.js";
 import { withSayButton, readInstruction } from "./readaloud.js";
 
 export const RAINBOW = [
@@ -211,6 +212,7 @@ export function setupRainbow(root, word, onDone) {
     pop.classList.remove("show");
     void pop.offsetWidth;
     pop.classList.add("show");
+    if (goes === NEEDED) bumpStat("rainbow");
     lastCheer = goes >= NEEDED ? praise("rainbow") : praise("star");
     sound(goes >= NEEDED ? "fanfare" : "star");
     cheer(spoken(goes >= NEEDED ? lastCheer.split("!")[0] + "!" : `${lastCheer} ${goes === 1 ? "That's one!" : "That's two!"}`));

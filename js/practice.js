@@ -2,7 +2,8 @@
 
 import { trick as getTrick } from "./mnemonics.js";
 import { trickCardHtml, trickWordHtml } from "./trickview.js";
-import { wordState, isDue, recordAttempt, MASTERED_BOX, garden, grewToday } from "./store.js";
+import { wordState, isDue, recordAttempt, MASTERED_BOX, garden, grewToday, bumpStat, maxStat } from "./store.js";
+import { checkRewards, rewardsHtml, rewardsSpeech } from "./rewards.js";
 import { alignSpelling, describeDifference } from "./align.js";
 import { instructionHtml, readInstruction, withSayButton } from "./readaloud.js";
 import { say, sayLetter, stop, cheer, warm, sayChunk } from "./speech.js";
@@ -201,6 +202,7 @@ function feedbackStep(session, attempt, answer) {
     result = recordAttempt(word, correct, answer);
     session.results.push({ word, correct, box: result.state.box });
     session.streak = correct ? session.streak + 1 : 0;
+    maxStat("bestStreak", session.streak);
     if (result.seedsEarned) toast(`+${result.seedsEarned} 🌰`);
   }
 
@@ -289,13 +291,17 @@ function nextWord(session) {
 function endScreen(session) {
   const right = session.results.filter((r) => r.correct).length;
   const missionDone = checkMission();
-  const headline = praise(right === session.results.length && right > 0 ? "perfect" : "end");
+  const perfect = right === session.results.length && right > 0;
+  if (perfect) bumpStat("perfect");
+  const rewards = checkRewards();
+  const headline = praise(perfect ? "perfect" : "end");
   app.innerHTML = h`
     <div class="celebrate">
       <div class="burst" aria-hidden="true">${session.results.map((r) => plantFor(r.box)).join(" ")}</div>
       <h2>${esc(headline)}</h2>
       <p>You practised ${session.results.length} words and spelt ${right} first time.</p>
       ${missionDone ? `<div class="tip card mission-done">🏅 Weekly mission complete! +10 🌰</div>` : ""}
+      ${rewardsHtml(rewards, { link: false })}
       ${companionHtml("end")}
       <div class="row">
         <button class="btn primary big" id="again">Practise more</button>
@@ -304,6 +310,6 @@ function endScreen(session) {
       </div>
     </div>`;
   sound("fanfare");
-  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : app.querySelector(".bubble .say-text")?.textContent || ""}`);
+  cheer(`${spoken(headline)} ${missionDone ? "You finished your weekly mission!" : ""} ${rewardsSpeech(rewards) || (missionDone ? "" : app.querySelector(".bubble .say-text")?.textContent || "")}`);
   on("#again", "click", () => startSession(session.fam, session.groupKey));
 }

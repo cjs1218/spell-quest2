@@ -28,15 +28,22 @@ export const AVATARS = ["🦊", "🐰", "🐻", "🐼", "🐸", "🐯", "🦄", 
 export const BOX_INTERVAL_DAYS = [0, 1, 2, 4, 7];
 export const MASTERED_BOX = 4;
 
-export const SEEDS = { correct: 1, mastered: 5, game: 1, mission: 10 };
+// Spelling earns more than games, so seeds keep encouraging the learning:
+// a word that grows earns 2, practising it again the same day ("watering")
+// earns 1, a fully grown flower earns a bonus 5, each game round won earns 1.
+export const SEEDS = { correct: 2, watered: 1, mastered: 5, game: 1, mission: 10 };
 
 const emptyProfileData = () => ({
   words: {},
   streakDays: [],
   comebacks: 0,
   seeds: 0,
-  owned: { flowers: ["🌻"], decor: [] },
-  garden: { flower: "🌻", decor: [] },
+  owned: { flowers: ["🌻"], decor: [], hazel: [] },
+  garden: { flower: "🌻", decor: [], placed: {} }, // placed: area id -> items shown there
+  hazel: {}, // Hazel's outfit: { hat, face, neck, held }
+  visitors: {}, // visitor id -> date earned
+  areasSeen: ["flowers"], // garden areas already celebrated
+  stats: {}, // games, perfect, bestStreak, missions, rainbow, longestWord
   mistakes: {}, // type -> count
   mistakeLog: [], // recent { word, answer, types, at }
   mission: null,
@@ -202,9 +209,10 @@ export function recordAttempt(word, correct, answer = "") {
   // Spaced practice: a word can only grow one step per day. Extra practice the
   // same day still counts as "watering" (and earns a seed) but the plant waits
   // until tomorrow to grow again. Likewise a slip only moves it back once a day.
+  if (correct) data.stats.longestWord = Math.max(data.stats.longestWord || 0, word.length);
   if (correct && s.grewOn === day && s.box < MASTERED_BOX) {
     watered = true;
-    seedsEarned += SEEDS.correct;
+    seedsEarned += SEEDS.watered;
   } else if (correct) {
     s.box = Math.min(s.box + 1, MASTERED_BOX);
     if (s.box > before) s.grewOn = day;
@@ -292,7 +300,47 @@ export function spendSeeds(n) {
 export const garden = () => data.garden;
 export const owned = () => data.owned;
 export function ownItem(kind, item) {
+  data.owned[kind] ||= [];
   if (!data.owned[kind].includes(item)) data.owned[kind].push(item);
+  save();
+}
+
+// Items placed in each garden area (the flower garden uses garden.decor).
+export const placedIn = (area) => (area === "flowers" ? data.garden.decor : data.garden.placed?.[area] || []);
+export function setPlaced(area, items) {
+  if (area === "flowers") data.garden.decor = items;
+  else data.garden.placed = { ...(data.garden.placed || {}), [area]: items };
+  save();
+}
+
+// ---------- rewards: Hazel's outfit, visitors, areas, stats ----------
+
+export const hazelOutfit = () => data.hazel || {};
+export function setHazel(part, item) {
+  data.hazel = { ...(data.hazel || {}), [part]: item || null };
+  save();
+}
+
+export const stats = () => data.stats || {};
+export function bumpStat(key, n = 1) {
+  data.stats = { ...(data.stats || {}), [key]: (data.stats?.[key] || 0) + n };
+  save();
+}
+export function maxStat(key, value) {
+  if ((data.stats?.[key] || 0) >= value) return;
+  data.stats = { ...(data.stats || {}), [key]: value };
+  save();
+}
+
+export const visitorsEarned = () => data.visitors || {};
+export function addVisitor(id) {
+  data.visitors = { ...(data.visitors || {}), [id]: today() };
+  save();
+}
+
+export const areasSeen = () => data.areasSeen || ["flowers"];
+export function markAreaSeen(id) {
+  if (!areasSeen().includes(id)) data.areasSeen = [...areasSeen(), id];
   save();
 }
 export function setGarden(next) {

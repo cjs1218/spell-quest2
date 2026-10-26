@@ -13,7 +13,7 @@ import { chunks, syllabify } from "./syllables.js";
 import { getGroups, getGroup, findFamily, allWords, schoolGroup } from "./groups.js";
 import { MISTAKE_TYPES } from "./mistakes.js";
 import { currentMission } from "./mission.js";
-import { companionHtml } from "./companion.js";
+import { companionHtml, hazelHtml } from "./companion.js";
 import { gamesFor } from "./games.js";
 import { startSession } from "./practice.js";
 import { picture } from "./pictures.js";
@@ -89,7 +89,7 @@ export function homeScreen() {
       <a class="icon-btn" href="#/settings" aria-label="Settings">⚙️</a>
     </header>
     ${sugg
-      ? `<div class="companion" role="status"><span class="hedgehog" aria-hidden="true">🦔</span><p class="bubble speakable"><span class="say-text">Hi ${esc(me.name)}! ${esc(MISTAKE_TYPES[sugg.type].label)} have been a bit tricky. Shall we practise <a href="#/family/${sugg.fam.id}">${esc(sugg.fam.name)}</a>?</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p></div>`
+      ? `<div class="companion" role="status">${hazelHtml()}<p class="bubble speakable"><span class="say-text">Hi ${esc(me.name)}! ${esc(MISTAKE_TYPES[sugg.type].label)} have been a bit tricky. Shall we practise <a href="#/family/${sugg.fam.id}">${esc(sugg.fam.name)}</a>?</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p></div>`
       : companionHtml("greet")}
 
     ${plan.words.length ? h`
