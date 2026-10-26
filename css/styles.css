@@ -706,12 +706,9 @@ select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem
 
 /* Hazel and her outfit */
 .hedgehog { position: relative; display: inline-block; flex: none; }
-.hedgehog .hog { display: inline-block; }
-.hedgehog .acc { position: absolute; line-height: 1; pointer-events: none; }
-.hedgehog .acc-hat { font-size: 0.55em; top: -0.32em; left: 0.36em; transform: rotate(-12deg); }
-.hedgehog .acc-face { font-size: 0.34em; top: 0.38em; left: 0.08em; }
-.hedgehog .acc-neck { font-size: 0.38em; bottom: 0.08em; left: 0.38em; }
-.hedgehog .acc-held { font-size: 0.5em; bottom: 0; right: -0.32em; }
+.hedgehog .hog { display: block; width: 1.15em; height: 1.15em; overflow: visible; }
+.hedgehog .acc { position: absolute; line-height: 1; pointer-events: none; transform-origin: center; }
+.hedgehog .paw { position: absolute; left: 88%; top: 80%; width: 0.2em; height: 0.16em; transform: translate(-50%, -50%); pointer-events: none; }
 .hedgehog.big { font-size: 6rem; }
 .hazel-stage { display: flex; justify-content: center; padding: 1.2rem 0 0.4rem; }
 
