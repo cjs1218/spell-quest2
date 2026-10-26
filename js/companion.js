@@ -50,6 +50,13 @@ const WEAR_ITEM = {
   "📚": { x: 90, y: 74, s: 0.32 },
   "🪄": { x: 98, y: 66, s: 0.38 },
 };
+// Glasses are drawn on Hazel's own picture (same coordinates), because
+// devices place the glasses emoji at different heights.
+const DRAWN = {
+  "👓": `<path d="M68 52 L60 49" stroke="#333" stroke-width="2" stroke-linecap="round"/><circle cx="76" cy="57" r="7" fill="rgba(200,230,255,.35)" stroke="#333" stroke-width="2.2"/><path d="M83 56 Q86 54 89 56" stroke="#333" stroke-width="2" fill="none"/><circle cx="91.5" cy="57" r="3.2" fill="rgba(200,230,255,.35)" stroke="#333" stroke-width="1.8"/>`,
+  "🕶️": `<path d="M68 52 L60 49" stroke="#222" stroke-width="2.2" stroke-linecap="round"/><path d="M67 52 Q76 50 85 52 Q85 63 76 64 Q67 63 67 52 Z" fill="#1d1d1f" stroke="#111" stroke-width="1.5"/><path d="M71 54 Q73 53 75 54" stroke="#9aa4ae" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M85 53 Q87 52 89 53 L90 58 Q88 60 87 58 Z" fill="#1d1d1f"/>`,
+};
+
 // The paw that holds things, drawn over the bottom of the held item.
 const PAW = `<svg class="paw" viewBox="0 0 20 16" aria-hidden="true" focusable="false"><ellipse cx="10" cy="8" rx="9" ry="7" fill="#5d3720"/><path d="M5 5 Q7 3 9 5 M10 4.5 Q12 2.5 14 4.5" stroke="#3e2414" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>`;
 
@@ -58,6 +65,7 @@ export function hazelHtml(size = "") {
   const acc = (part) => {
     const item = o[part];
     if (!item) return "";
+    if (DRAWN[item]) return `<svg class="acc-layer" viewBox="0 0 100 100" aria-hidden="true" focusable="false">${DRAWN[item]}</svg>`;
     const at = { ...WEAR[part], ...(WEAR_ITEM[item] || {}) };
     return `<span class="acc acc-${part}" style="left:${at.x}%;top:${at.y}%;font-size:${at.s}em;transform:translate(-50%,-50%) rotate(${at.r || 0}deg)">${item}</span>`;
   };

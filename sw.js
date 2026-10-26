@@ -3,7 +3,7 @@
 // refreshed in the background so updates arrive on the next visit.
 // Bump VERSION when files are added or removed.
 
-const VERSION = "spellquest-v12";
+const VERSION = "spellquest-v13";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -25,8 +25,9 @@ const APP_FILES = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(VERSION).then((cache) =>
-      // Add files one by one so a single missing file can't break installing.
-      Promise.all(APP_FILES.map((url) => cache.add(url).catch(() => null)))
+      // Add files one by one so a single missing file can't break installing,
+      // fetched fresh (not from the browser's own cache) so versions never mix.
+      Promise.all(APP_FILES.map((url) => cache.add(new Request(url, { cache: "reload" })).catch(() => null)))
     ).then(() => self.skipWaiting())
   );
 });
