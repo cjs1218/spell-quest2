@@ -6,7 +6,7 @@
 import { getGroups, allWords } from "./groups.js";
 import {
   wordState, MASTERED_BOX, seeds, spendSeeds, owned, ownItem, garden, setGarden,
-  placedIn, setPlaced, hazelOutfit, setHazel, visitorsEarned,
+  placedIn, setPlaced, hazelOutfit, setHazel, visitorsEarned, layoutOf, setLayoutItem, resetLayout,
 } from "./store.js";
 import { AREAS, WARDROBE, VISITORS, progressSnapshot, areaOpen, checkRewards } from "./rewards.js";
 import { companionHtml, hazelHtml } from "./companion.js";
@@ -40,7 +40,8 @@ export const DECOR = [
 ];
 
 // What the child is looking at, kept while they shop.
-let view = { area: "flowers", tab: "shop" };
+// arranging: moving things around the garden; selected: the thing they tapped.
+let view = { area: "flowers", tab: "shop", arranging: false, selected: null };
 
 const plantFor = (box) => (box >= MASTERED_BOX ? garden().flower : PLANTS[box]);
 
@@ -58,15 +59,23 @@ function gardenPlants() {
   return plants.sort((a, b) => b.box - a.box);
 }
 
-// Spread decorations evenly between other cells.
-function mix(cells, extras) {
-  const out = [...cells];
-  extras.forEach((d, i) => {
-    const at = Math.min(out.length, Math.round(((i + 1) * (out.length + 1)) / (extras.length + 1)));
-    out.splice(at, 0, d);
-  });
-  return out;
+// Things the child can move around in an area: placed decorations, plus
+// visitors in the flower garden.
+function sceneItems(area) {
+  const names = Object.fromEntries([...DECOR, ...area.items].map((x) => [x.item, x.name]));
+  const items = placedIn(area.id).map((d) => ({ key: d, icon: d, name: names[d] || "decoration" }));
+  if (area.id === "flowers") {
+    for (const v of VISITORS) if (visitorsEarned()[v.id]) items.push({ key: `v:${v.id}`, icon: v.icon, name: v.name, visitor: true });
+  }
+  return items;
 }
+
+// Where something goes before the child has moved it: spread out, never random.
+function defaultSpot(i) {
+  return { x: 8 + ((i * 0.618 + 0.31) % 1) * 84, y: 18 + ((i * 0.382 + 0.55) % 1) * 68, s: 1, f: false, z: 0 };
+}
+const spotOf = (area, item, i) => ({ ...defaultSpot(i), ...(layoutOf(area.id)[item.key] || {}) });
+const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 function plotHtml(area, p) {
   if (!areaOpen(area, p)) {
@@ -79,17 +88,48 @@ function plotHtml(area, p) {
         <div class="meter" aria-hidden="true"><span style="width:${Math.min(100, (p.grown / area.need) * 100)}%"></span></div>
       </div>`;
   }
-  const placed = placedIn(area.id).map((d) => `<span class="decor" aria-hidden="true">${d}</span>`);
+  const items = sceneItems(area);
+  const things = items.map((it, i) => {
+    const at = spotOf(area, it, i);
+    const style = `left:${at.x}%;top:${at.y}%;z-index:${2 + (at.z || 0)};--s:${at.s || 1};--f:${at.f ? -1 : 1}`;
+    return view.arranging
+      ? `<button type="button" class="decor movable ${it.visitor ? "visitor" : ""} ${view.selected === it.key ? "selected" : ""}" data-key="${esc(it.key)}"
+          style="${style}" aria-label="Move the ${esc(it.name)}" aria-pressed="${view.selected === it.key}"><span>${it.icon}</span></button>`
+      : `<span class="decor ${it.visitor ? "visitor" : ""}" style="${style}" title="${esc(it.name)}" aria-hidden="true"><span>${it.icon}</span></span>`;
+  }).join("");
+
+  let bed = "";
   if (area.id === "flowers") {
     const plants = gardenPlants();
-    const cells = plants.map((pl) => `<button class="plant" data-word="${esc(pl.word)}" aria-label="${esc(pl.word)}">${plantFor(pl.box)}</button>`);
-    const visitors = VISITORS.filter((v) => visitorsEarned()[v.id]).map((v) => `<span class="decor visitor" title="${esc(v.name)}" aria-hidden="true">${v.icon}</span>`);
-    const all = mix(cells, [...placed, ...visitors]);
-    return `<div class="garden-plot card" style="--sky:${area.sky};--ground:${area.ground}" aria-label="${plants.length} plants">
-      ${all.length ? all.join("") : `<p class="muted">Your garden is waiting! Practise some words to plant your first seeds.</p>`}</div>`;
+    bed = plants.length
+      ? `<div class="bed">${plants.map((pl) => `<button class="plant" data-word="${esc(pl.word)}" aria-label="${esc(pl.word)}" ${view.arranging ? 'tabindex="-1"' : ""}>${plantFor(pl.box)}</button>`).join("")}</div>`
+      : `<p class="muted bed-empty">Your garden is waiting! Practise some words to plant your first seeds.</p>`;
+  } else if (!items.length) {
+    bed = `<p class="muted area-empty">Welcome to the ${esc(area.name)}! Buy things in the shop below to fill it.</p>`;
   }
-  return `<div class="garden-plot card area-${area.id}" style="--sky:${area.sky};--ground:${area.ground}">
-    ${placed.length ? placed.join("") : `<p class="muted area-empty">Welcome to the ${esc(area.name)}! Buy things in the shop below to fill it.</p>`}</div>`;
+  return `<div class="garden-plot card scene area-${area.id} ${view.arranging ? "arranging" : ""}" id="scene" style="--sky:${area.sky};--ground:${area.ground}">
+    ${bed}${things}</div>`;
+}
+
+function arrangeBarHtml(area, p) {
+  if (!areaOpen(area, p) || !sceneItems(area).length) return "";
+  if (!view.arranging) {
+    return `<div class="arrange-bar"><button class="btn" id="arrange-start">✋ Move things around</button></div>`;
+  }
+  const sel = view.selected;
+  return h`
+    <div class="arrange-bar arranging card speakable" role="group" aria-label="Arrange your garden">
+      <p class="arrange-hint"><span class="say-text">${sel
+        ? "Drag it, or tap where it should go. You can make it bigger, smaller or turn it round."
+        : "Drag things to where you want them. Or tap one, then tap where it should go."}</span><button class="say-btn" type="button" aria-label="Read this out">🔊</button></p>
+      <div class="arrange-tools">
+        <button class="btn small" data-tool="smaller" ${sel ? "" : "disabled"} aria-label="Make it smaller">➖ Smaller</button>
+        <button class="btn small" data-tool="bigger" ${sel ? "" : "disabled"} aria-label="Make it bigger">➕ Bigger</button>
+        <button class="btn small" data-tool="flip" ${sel ? "" : "disabled"} aria-label="Turn it round">↔️ Turn round</button>
+        <button class="btn small" data-tool="tidy" aria-label="Put everything back where it started">🧹 Start again</button>
+        <button class="btn primary small" id="arrange-done">✅ Done</button>
+      </div>
+    </div>`;
 }
 
 function shopButton(kind, x, { owned: has, placed, area }) {
@@ -175,7 +215,8 @@ export function gardenScreen() {
     ${header("#/", "My garden", `<span class="seed-pill">🌰 ${seeds()}</span>`)}
     <div class="area-tabs" role="group" aria-label="Garden areas">${tabs}</div>
     ${plotHtml(area, p)}
-    <p class="muted center small">${grown} flowers fully grown${area.id === "flowers" ? " · tap a plant to hear its word" : ""}</p>
+    ${arrangeBarHtml(area, p)}
+    <p class="muted center small">${grown} flowers fully grown${area.id === "flowers" && !view.arranging ? " · tap a plant to hear its word" : ""}</p>
     ${companionHtml(bubble, { custom: true })}
     <div class="garden-tabs" role="tablist">
       <button class="garden-tab ${view.tab === "shop" ? "active" : ""}" data-tab="shop" role="tab" aria-selected="${view.tab === "shop"}">🛒 Shop</button>
@@ -188,9 +229,10 @@ export function gardenScreen() {
 
   if (fresh.areas.length || fresh.visitors.length) { sound("fanfare"); cheer(bubble); }
 
-  on(".plant", "click", (e) => say(e.currentTarget.dataset.word));
+  on(".plant", "click", (e) => { if (!view.arranging) say(e.currentTarget.dataset.word); });
+  setUpArranging(area);
   on(".area-tab", "click", (e) => {
-    view = { ...view, area: e.currentTarget.dataset.area, tab: view.tab === "hazel" || view.tab === "visitors" ? "shop" : view.tab };
+    view = { ...view, area: e.currentTarget.dataset.area, tab: view.tab === "hazel" || view.tab === "visitors" ? "shop" : view.tab, arranging: false, selected: null };
     keepScroll(gardenScreen);
   });
   on(".garden-tab", "click", (e) => {
@@ -217,5 +259,116 @@ export function gardenScreen() {
       setPlaced(areaId, d.includes(item) && has ? d.filter((x) => x !== item) : [...new Set([...d, item])]);
     }
     keepScroll(gardenScreen);
+  });
+}
+
+// ---------- moving things around ----------
+
+function setUpArranging(area) {
+  const redraw = () => keepScroll(gardenScreen);
+  app.querySelector("#arrange-start")?.addEventListener("click", () => {
+    view = { ...view, arranging: true, selected: null };
+    sound("pop");
+    redraw();
+  });
+  app.querySelector("#arrange-done")?.addEventListener("click", () => {
+    view = { ...view, arranging: false, selected: null };
+    sound("seed");
+    toast("Your garden looks lovely! 🌷");
+    redraw();
+  });
+  if (!view.arranging) return;
+
+  const scene = app.querySelector("#scene");
+  const topZ = () => Math.max(0, ...Object.values(layoutOf(area.id)).map((p) => p.z || 0)) + 1;
+  const pointIn = (e) => {
+    const r = scene.getBoundingClientRect();
+    return { x: clamp(((e.clientX - r.left) / r.width) * 100, 3, 97), y: clamp(((e.clientY - r.top) / r.height) * 100, 6, 94) };
+  };
+  const current = (key) => {
+    const items = sceneItems(area);
+    const i = items.findIndex((it) => it.key === key);
+    return spotOf(area, items[i], i);
+  };
+
+  app.querySelectorAll("[data-tool]").forEach((b) => b.addEventListener("click", () => {
+    const tool = b.dataset.tool;
+    if (tool === "tidy") {
+      resetLayout(area.id);
+      view = { ...view, selected: null };
+      toast("Everything's back where it started");
+      redraw();
+      return;
+    }
+    const key = view.selected;
+    if (!key) return;
+    const at = current(key);
+    if (tool === "bigger") setLayoutItem(area.id, key, { s: clamp(Math.round(((at.s || 1) + 0.25) * 100) / 100, 0.5, 2.5) });
+    if (tool === "smaller") setLayoutItem(area.id, key, { s: clamp(Math.round(((at.s || 1) - 0.25) * 100) / 100, 0.5, 2.5) });
+    if (tool === "flip") setLayoutItem(area.id, key, { f: !at.f });
+    sound("pop");
+    redraw();
+  }));
+
+  // Tap an empty spot to move the chosen thing there.
+  scene.addEventListener("click", (e) => {
+    if (e.target.closest(".movable") || !view.selected) return;
+    setLayoutItem(area.id, view.selected, { ...pointIn(e), z: topZ() });
+    sound("pop");
+    redraw();
+  });
+
+  scene.querySelectorAll(".movable").forEach((el) => {
+    const key = el.dataset.key;
+    let start = null;
+    let moved = false;
+    el.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      start = { x: e.clientX, y: e.clientY };
+      moved = false;
+      el.setPointerCapture?.(e.pointerId);
+      el.style.zIndex = 99;
+    });
+    el.addEventListener("pointermove", (e) => {
+      if (!start) return;
+      if (!moved && Math.hypot(e.clientX - start.x, e.clientY - start.y) < 6) return;
+      moved = true;
+      el.classList.add("dragging");
+      const at = pointIn(e);
+      el.style.left = `${at.x}%`;
+      el.style.top = `${at.y}%`;
+    });
+    const finish = (e) => {
+      if (!start) return;
+      start = null;
+      if (moved) {
+        setLayoutItem(area.id, key, { ...pointIn(e), z: topZ() });
+        view = { ...view, selected: key };
+        sound("pop");
+      } else {
+        view = { ...view, selected: view.selected === key ? null : key };
+      }
+      redraw();
+    };
+    el.addEventListener("pointerup", finish);
+    el.addEventListener("pointercancel", () => { start = null; redraw(); });
+    // Keyboard: arrow keys nudge the chosen thing.
+    el.addEventListener("keydown", (e) => {
+      const step = { ArrowLeft: [-3, 0], ArrowRight: [3, 0], ArrowUp: [0, -4], ArrowDown: [0, 4] }[e.key];
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        view = { ...view, selected: view.selected === key ? null : key };
+        redraw();
+        app.querySelector(`.movable[data-key="${CSS.escape(key)}"]`)?.focus();
+        return;
+      }
+      if (!step) return;
+      e.preventDefault();
+      const at = current(key);
+      setLayoutItem(area.id, key, { x: clamp(at.x + step[0], 3, 97), y: clamp(at.y + step[1], 6, 94) });
+      view = { ...view, selected: key };
+      redraw();
+      app.querySelector(`.movable[data-key="${CSS.escape(key)}"]`)?.focus();
+    });
   });
 }

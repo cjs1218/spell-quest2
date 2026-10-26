@@ -668,7 +668,32 @@ select { display: block; width: 100%; margin-top: 0.3rem; padding: 0.6rem 0.8rem
 .garden-plot.locked { display: block; text-align: center; min-height: 0; filter: saturate(0.6); }
 .locked-msg { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.2rem 0 0.6rem; }
 .lock-icon { font-size: 2.4rem; }
-.decor.visitor { animation: bob 3.5s ease-in-out infinite; }
+/* The garden as a scene the child can arrange */
+.garden-plot.scene { display: block; position: relative; min-height: 17rem; overflow: hidden; padding: 0.8rem; }
+.garden-plot.scene .bed { display: flex; flex-wrap: wrap; gap: 0.2rem; justify-content: center; padding-top: 4.5rem; }
+.garden-plot.scene .bed-empty, .garden-plot.scene .area-empty { position: relative; z-index: 1; text-align: center; margin-top: 5rem; }
+.garden-plot.scene .decor {
+  position: absolute; transform: translate(-50%, -50%) scale(var(--s, 1)); transform-origin: center;
+  font-size: 2.2rem; line-height: 1; padding: 0.15rem; pointer-events: none;
+}
+.garden-plot.scene .decor > span { display: inline-block; scale: var(--f, 1) 1; }
+.garden-plot.scene .decor.visitor > span { animation: bob 3.5s ease-in-out infinite; }
+.garden-plot.arranging { outline: 3px dashed var(--accent); outline-offset: -6px; cursor: crosshair; }
+.garden-plot.arranging .plant { opacity: 0.45; pointer-events: none; }
+.garden-plot.arranging .decor.movable {
+  pointer-events: auto; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  background: color-mix(in srgb, #fff 55%, transparent); border: 2px dashed color-mix(in srgb, var(--text) 35%, transparent);
+  border-radius: 0.8rem; font-family: inherit; color: inherit;
+}
+.garden-plot.arranging .decor.movable > span { animation: none; }
+.garden-plot.arranging .decor.selected { border: 3px solid var(--accent); background: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent); }
+.garden-plot.arranging .decor.dragging { cursor: grabbing; opacity: 0.85; }
+.arrange-bar { display: flex; justify-content: center; margin: 0.5rem 0; }
+.arrange-bar.arranging { flex-direction: column; align-items: stretch; padding: 0.7rem 0.8rem; }
+.arrange-hint { margin: 0 0 0.5rem; text-align: center; font-weight: 600; }
+.arrange-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.arrange-tools .btn { min-height: 2.8rem; }
+.arrange-tools .btn[disabled] { opacity: 0.45; cursor: default; }
 .shop.preview .shop-item { opacity: 0.55; cursor: default; }
 
 .garden-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin: 0.4rem 0 0.9rem; }

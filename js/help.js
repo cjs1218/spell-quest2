@@ -16,6 +16,7 @@ const KID_STEPS = [
   { icon: "🤔", title: "Stuck? That's OK!", text: "Tap 👀 to peek. Orange letters show what to fix." },
   { icon: "🌻", title: "Grow your garden", text: "Right answers grow plants. Come back tomorrow to grow more!" },
   { icon: "🌰", title: "Spend your seeds", text: "Buy things for your garden, and dress up Hazel!" },
+  { icon: "✋", title: "Arrange your garden", text: "Tap Move things around, then drag things where you want them." },
   { icon: "🗺️", title: "Open new places", text: "Grow more flowers to open the meadow, the pond and more." },
   { icon: "🦋", title: "Collect visitors", text: "Animals come to visit when you reach a goal." },
   { icon: "🎲", title: "Play games", text: "Pick a year to find the games." },

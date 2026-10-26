@@ -3,7 +3,7 @@
 // refreshed in the background so updates arrive on the next visit.
 // Bump VERSION when files are added or removed.
 
-const VERSION = "spellquest-v10";
+const VERSION = "spellquest-v11";
 const APP_FILES = [
   "./",
   "./index.html",

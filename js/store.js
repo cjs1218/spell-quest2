@@ -39,7 +39,7 @@ const emptyProfileData = () => ({
   comebacks: 0,
   seeds: 0,
   owned: { flowers: ["🌻"], decor: [], hazel: [] },
-  garden: { flower: "🌻", decor: [], placed: {} }, // placed: area id -> items shown there
+  garden: { flower: "🌻", decor: [], placed: {}, layout: {} }, // placed: area id -> items shown there; layout: where the child put them
   hazel: {}, // Hazel's outfit: { hat, face, neck, held }
   visitors: {}, // visitor id -> date earned
   areasSeen: ["flowers"], // garden areas already celebrated
@@ -310,6 +310,19 @@ export const placedIn = (area) => (area === "flowers" ? data.garden.decor : data
 export function setPlaced(area, items) {
   if (area === "flowers") data.garden.decor = items;
   else data.garden.placed = { ...(data.garden.placed || {}), [area]: items };
+  save();
+}
+
+// Where the child has put things in each area: key -> { x, y (percent), s (size), f (flipped), z (layer) }.
+export const layoutOf = (area) => data.garden.layout?.[area] || {};
+export function setLayoutItem(area, key, pos) {
+  const layout = { ...(data.garden.layout || {}) };
+  layout[area] = { ...(layout[area] || {}), [key]: { ...(layout[area]?.[key] || {}), ...pos } };
+  data.garden.layout = layout;
+  save();
+}
+export function resetLayout(area) {
+  data.garden.layout = { ...(data.garden.layout || {}), [area]: {} };
   save();
 }
 

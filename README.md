@@ -89,6 +89,10 @@ school lists, keeping progress safe, and questions and fixes. It can be printed.
   milestones (first flower, practising on 7 days, 8 right in a row, growing a whole
   family, a word with 10+ letters...). They're earned, never bought, and show as
   silhouettes with a hint until found.
+- **Arrange your own garden:** tap *Move things around*, then drag decorations
+  and visitors anywhere, or tap one and tap where it should go. Things can be
+  made bigger or smaller and turned round, and *Start again* tidies them back.
+  Each area remembers its own layout.
 - **Hazel's wardrobe:** hats, glasses, scarves and things to hold. Hazel wears
   her outfit everywhere she appears.
 - Nothing is random, nothing expires, and nothing is lost by missing a day.
