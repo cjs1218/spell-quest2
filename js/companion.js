@@ -50,11 +50,18 @@ const WEAR_ITEM = {
   "📚": { x: 90, y: 74, s: 0.32 },
   "🪄": { x: 98, y: 66, s: 0.38 },
 };
-// Glasses are drawn on Hazel's own picture (same coordinates), because
-// devices place the glasses emoji at different heights.
+// Glasses and things she holds are drawn on Hazel's own picture (same coordinates), because
+// devices draw those emoji at different heights and angles.
 const DRAWN = {
   "👓": `<path d="M68 52 L60 49" stroke="#333" stroke-width="2" stroke-linecap="round"/><circle cx="76" cy="57" r="7" fill="rgba(200,230,255,.35)" stroke="#333" stroke-width="2.2"/><path d="M83 56 Q86 54 89 56" stroke="#333" stroke-width="2" fill="none"/><circle cx="91.5" cy="57" r="3.2" fill="rgba(200,230,255,.35)" stroke="#333" stroke-width="1.8"/>`,
   "🕶️": `<path d="M68 52 L60 49" stroke="#222" stroke-width="2.2" stroke-linecap="round"/><path d="M67 52 Q76 50 85 52 Q85 63 76 64 Q67 63 67 52 Z" fill="#1d1d1f" stroke="#111" stroke-width="1.5"/><path d="M71 54 Q73 53 75 54" stroke="#9aa4ae" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M85 53 Q87 52 89 53 L90 58 Q88 60 87 58 Z" fill="#1d1d1f"/>`,
+  // Things to hold: drawn rising from her paw (at 88,80) and out in front of her face.
+  "🍭": `<path d="M89 80 L103 56" stroke="#f1e6d0" stroke-width="3.2" stroke-linecap="round"/><path d="M89 80 L103 56" stroke="#d8c7a6" stroke-width="1" stroke-linecap="round"/><circle cx="106" cy="47" r="11" fill="#ff7eb6" stroke="#e0508f" stroke-width="1.5"/><path d="M106 47 m0 -1.5 a1.5 1.5 0 1 1 -1.5 1.5 a3.5 3.5 0 1 1 3.5 3.5 a5.5 5.5 0 1 1 -5.5 -5.5 a7.5 7.5 0 1 1 7.5 7.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
+  "🎈": `<path d="M89 80 Q97 66 92 54 Q88 44 99 36" fill="none" stroke="#777" stroke-width="1.3"/><path d="M97 37 L101 37 L99 34 Z" fill="#c62828"/><ellipse cx="99" cy="21" rx="11" ry="13.5" fill="#e53935" stroke="#c62828" stroke-width="1.2"/><ellipse cx="95" cy="16" rx="2.6" ry="4.2" fill="#fff" opacity=".55"/>`,
+  "🌻": `<path d="M89 80 Q96 64 100 50" fill="none" stroke="#43a047" stroke-width="3" stroke-linecap="round"/><path d="M95 64 Q103 60 104 66 Q99 68 95 64 Z" fill="#66bb6a"/><g fill="#fdd835" stroke="#f9a825" stroke-width=".8">${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<ellipse cx="101" cy="34" rx="3.6" ry="7" transform="rotate(${a} 101 42)"/>`).join("")}</g><circle cx="101" cy="42" r="5.5" fill="#6d4c41"/><circle cx="101" cy="42" r="3" fill="#4e342e"/>`,
+  "☂️": `<path d="M89 82 Q89 87 93 87 Q97 87 97 83 L97 24" fill="none" stroke="#5d4037" stroke-width="2.4" stroke-linecap="round"/><path d="M73 28 Q97 0 121 28 Q115 23 109 28 Q103 23 97 28 Q91 23 85 28 Q79 23 73 28 Z" fill="#7e57c2" stroke="#5e35b1" stroke-width="1.2"/><path d="M97 10 L97 6" stroke="#5d4037" stroke-width="2" stroke-linecap="round"/>`,
+  "📚": `<rect x="84" y="80" width="26" height="6" rx="1.2" fill="#1e88e5"/><rect x="86" y="74" width="24" height="6" rx="1.2" fill="#43a047"/><rect x="83" y="68" width="25" height="6" rx="1.2" fill="#e53935"/><path d="M87 71 H105 M89 77 H107 M87 83 H107" stroke="#fff" stroke-width=".9" opacity=".7"/>`,
+  "🪄": `<path d="M89 80 L106 52" stroke="#212121" stroke-width="3.2" stroke-linecap="round"/><path d="M104 55.5 L106 52" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><path d="M108 38 L110.5 44.5 L117.5 44.8 L112 49 L114 55.8 L108 51.8 L102 55.8 L104 49 L98.5 44.8 L105.5 44.5 Z" fill="#ffd54f" stroke="#f9a825" stroke-width="1"/><path d="M118 34 v5 M115.5 36.5 h5 M98 36 v4 M96 38 h4" stroke="#ffca28" stroke-width="1.3" stroke-linecap="round"/>`,
 };
 
 // The paw that holds things, drawn over the bottom of the held item.
@@ -69,7 +76,7 @@ export function hazelHtml(size = "") {
     const at = { ...WEAR[part], ...(WEAR_ITEM[item] || {}) };
     return `<span class="acc acc-${part}" style="left:${at.x}%;top:${at.y}%;font-size:${at.s}em;transform:translate(-50%,-50%) rotate(${at.r || 0}deg)">${item}</span>`;
   };
-  return `<span class="hedgehog ${size}" aria-hidden="true">${HAZEL_SVG}${acc("hat")}${acc("face")}${acc("neck")}${acc("held")}${o.held ? PAW : ""}</span>`;
+  return `<span class="hedgehog ${size} ${o.held ? "holding" : ""}" aria-hidden="true">${HAZEL_SVG}${acc("hat")}${acc("face")}${acc("neck")}${acc("held")}${o.held ? PAW : ""}</span>`;
 }
 
 /** Hazel with a speech bubble. Pass a custom message or a kind of line. */
